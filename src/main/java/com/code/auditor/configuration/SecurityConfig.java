@@ -48,12 +48,12 @@ public class SecurityConfig {
                 )
                 .permitAll()
 
-                .antMatchers("/api/v1/assignment/**").hasAnyRole(ADMIN.name(), PROFESSOR.name())
+                .antMatchers("/api/v1/admin/**").hasAnyRole(ADMIN.name())
 
-                .antMatchers(POST, "/api/v1/assignment/**").hasAnyAuthority(ADMIN_CREATE.name(), PROFESSOR_CREATE.name())
-                .antMatchers(GET, "/api/v1/assignment/**").hasAnyAuthority(ADMIN_READ.name(), PROFESSOR_READ.name())
-                .antMatchers(PUT, "/api/v1/assignment/**").hasAnyAuthority(ADMIN_UPDATE.name(), PROFESSOR_UPDATE.name())
-                .antMatchers(DELETE, "/api/v1/assignment/**").hasAnyAuthority(ADMIN_DELETE.name(), PROFESSOR_DELETE.name())
+                .antMatchers(POST, "/api/v1/admin/**").hasAnyAuthority(ADMIN_CREATE.name())
+                .antMatchers(GET, "/api/v1/admin/**").hasAnyAuthority(ADMIN_READ.name())
+                .antMatchers(PUT, "/api/v1/admin/**").hasAnyAuthority(ADMIN_UPDATE.name())
+                .antMatchers(DELETE, "/api/v1/admin/**").hasAnyAuthority(ADMIN_DELETE.name())
 
 
                 .anyRequest()

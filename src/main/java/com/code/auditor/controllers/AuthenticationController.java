@@ -1,6 +1,6 @@
 package com.code.auditor.controllers;
 
-import com.code.auditor.domain.Staff;
+import com.code.auditor.domain.Student;
 import com.code.auditor.dtos.AuthenticationResponse;
 import com.code.auditor.dtos.AuthenticationRequest;
 import com.code.auditor.services.AuthenticationService;
@@ -24,8 +24,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Staff staff) {
-        return ResponseEntity.ok(authenticationService.registerStaff(staff));
+    public ResponseEntity<AuthenticationResponse> registerStudent(@RequestBody Student student) {
+        return ResponseEntity.ok(authenticationService.register(student));
     }
 
     @PostMapping("/login")

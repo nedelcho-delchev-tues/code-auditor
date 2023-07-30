@@ -22,8 +22,8 @@ public class AssignmentService {
     }
 
     public void createAssignment(AssignmentRequest assignmentCreationRequest) {
-        String email = jwtService.extractEmailFromRequest();
-        Staff staff = staffRepository.findByEmail(email).orElseThrow();
+        Staff user = (Staff) jwtService.extractEmailFromRequest();
+        Staff staff = staffRepository.findByEmail(user.getEmail()).orElseThrow();
 
         Assignment assignment = new Assignment(
                 assignmentCreationRequest.getTitle(),

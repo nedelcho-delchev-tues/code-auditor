@@ -1,14 +1,20 @@
 package com.code.auditor.domain;
 
 import com.google.gson.annotations.Expose;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "STUDENTS")
-public class Student {
-    /** The id. */
+public class Student implements UserDetails {
+
+    /**
+     * The id.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
@@ -17,70 +23,104 @@ public class Student {
     /**
      * The first name of the student.
      */
-    @Column(name = "FIRST_NAME", columnDefinition = "VARCHAR", nullable = false)
+    @Column(name = "FIRST_NAME", nullable = false)
     @Expose
     private String firstName;
 
     /**
      * The last name of the student.
      */
-    @Column(name = "LAST_NAME", columnDefinition = "VARCHAR", nullable = false)
+    @Column(name = "LAST_NAME", nullable = false)
     @Expose
     private String lastName;
 
     /**
      * The email of the student.
      */
-    @Column(nullable = false, unique = true)
+    @Column(name = "EMAIL", nullable = false, unique = true)
     @Expose
     private String email;
 
     /**
      * The password of the student.
      */
-    @Column(nullable = false)
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
     /**
      * The faculty of the student.
      */
-    @Column(nullable = false)
+    @Column(name = "FACULTY", nullable = false)
     @Expose
     private String faculty;
 
     /**
      * The faculty number of the student.
      */
-    @Column(name = "FACULTY_NUMBER", columnDefinition = "BIGINT", nullable = false)
+    @Column(name = "FACULTY_NUMBER", nullable = false)
     @Expose
-    private Long facultyNumber;
+    private String facultyNumber;
 
     /**
-     * The email of the student.
+     * The specialization of the student.
      */
-    @Column(name = "SPECIALIZATION", columnDefinition = "VARCHAR", nullable = false)
+    @Column(name = "SPECIALIZATION", nullable = false)
     @Expose
     private String specialization;
 
     /**
-     * The email of the student.
+     * The group of the student.
      */
-    @Column(name = "STUDENT_GROUP", columnDefinition = "INTEGER", nullable = false)
+    @Column(name = "STUDENT_GROUP", nullable = false)
     @Expose
-    private Integer group;
+    private String group;
 
     /**
-     * The email of the student.
+     * The stream of the student.
      */
-    @Column(name = "STUDENT_STREAM", columnDefinition = "INTEGER", nullable = false)
+    @Column(name = "STUDENT_STREAM", nullable = false)
     @Expose
-    private Integer stream;
+    private String stream;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<StudentSubmission> submissions;
 
     @OneToMany(mappedBy = "student")
     private List<Token> tokens;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public Long getId() {
+        return id;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -122,11 +162,11 @@ public class Student {
         this.faculty = faculty;
     }
 
-    public Long getFacultyNumber() {
+    public String getFacultyNumber() {
         return facultyNumber;
     }
 
-    public void setFacultyNumber(Long facultyNumber) {
+    public void setFacultyNumber(String facultyNumber) {
         this.facultyNumber = facultyNumber;
     }
 
@@ -138,19 +178,19 @@ public class Student {
         this.specialization = specialization;
     }
 
-    public Integer getGroup() {
+    public String getGroup() {
         return group;
     }
 
-    public void setGroup(Integer group) {
+    public void setGroup(String group) {
         this.group = group;
     }
 
-    public Integer getStream() {
+    public String getStream() {
         return stream;
     }
 
-    public void setStream(Integer stream) {
+    public void setStream(String stream) {
         this.stream = stream;
     }
 

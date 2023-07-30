@@ -1,8 +1,6 @@
 package com.code.auditor.configuration;
 
-import com.code.auditor.domain.Staff;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -37,11 +35,10 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 
-    public String extractEmailFromRequest() {
+    public Object extractEmailFromRequest() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() != null) {
-            Staff staff = (Staff) authentication.getPrincipal();
-            return staff.getEmail();
+            return authentication.getPrincipal();
         }
         return null;
     }

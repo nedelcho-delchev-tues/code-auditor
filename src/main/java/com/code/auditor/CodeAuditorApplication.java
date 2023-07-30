@@ -22,7 +22,7 @@ public class CodeAuditorApplication {
     public CommandLineRunner commandLineRunner(AuthenticationService service) {
         return args -> {
             Staff admin = new Staff("admin", "admin", "admin@codeauditor.com", "123456", Role.ADMIN);
-            System.out.println("Admin token: " + service.registerStaff(admin).getAccessToken());
+            System.out.println("Admin token: " + service.register(admin).getAccessToken());
         };
     }
 }

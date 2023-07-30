@@ -1,10 +1,8 @@
 package com.code.auditor.domain;
 
 import com.code.auditor.enums.Role;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.Expose;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -15,7 +13,9 @@ import java.util.List;
 @Table(name = "STAFF")
 public class Staff implements UserDetails {
 
-    /** The id. */
+    /**
+     * The id.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
@@ -65,7 +65,7 @@ public class Staff implements UserDetails {
     @OneToMany(mappedBy = "staff")
     private List<Token> tokens;
 
-    public Staff(){
+    public Staff() {
 
     }
 
