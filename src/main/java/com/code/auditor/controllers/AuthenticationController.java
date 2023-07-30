@@ -23,7 +23,6 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Staff staff) {
-        // maybe staff should be a DTO in the future
         return ResponseEntity.ok(authenticationService.registerStaff(staff));
     }
 

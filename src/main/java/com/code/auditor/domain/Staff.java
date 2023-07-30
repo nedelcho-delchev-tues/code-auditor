@@ -54,6 +54,7 @@ public class Staff implements UserDetails {
 
     @Enumerated(EnumType.ORDINAL)
     @Expose
+    @Column(name = "ROLE", columnDefinition = "VARCHAR", nullable = false)
     private Role role;
 
     @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
@@ -97,6 +98,22 @@ public class Staff implements UserDetails {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public List<Assignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<Assignment> assignments) {
+        this.assignments = assignments;
     }
 
     @Override
