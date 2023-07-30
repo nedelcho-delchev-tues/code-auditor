@@ -1,5 +1,7 @@
 package com.code.auditor.domain;
 
+import com.code.auditor.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.Expose;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -60,8 +62,23 @@ public class Staff implements UserDetails {
     @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
     private List<Assignment> assignments;
 
+    @OneToMany(mappedBy = "staff")
+    private List<Token> tokens;
+
     public Staff(){
 
+    }
+
+    public Staff(String firstName, String lastName, String email, String password, Role role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getFirstName() {
@@ -118,7 +135,7 @@ public class Staff implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return role.getAuthorities();
     }
 
     @Override

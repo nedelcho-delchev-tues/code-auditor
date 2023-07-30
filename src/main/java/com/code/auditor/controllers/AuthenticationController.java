@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -38,5 +40,13 @@ public class AuthenticationController {
             return ResponseEntity.ok("Logged out successfully");
         }
         return ResponseEntity.badRequest().body("Already logout or bad token");
+    }
+
+    @PostMapping("/refresh_token")
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        authenticationService.refreshToken(request, response);
     }
 }
