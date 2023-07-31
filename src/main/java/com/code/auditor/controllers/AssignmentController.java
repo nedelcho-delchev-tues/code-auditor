@@ -1,11 +1,12 @@
 package com.code.auditor.controllers;
 
 import com.code.auditor.domain.Assignment;
-import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.dtos.AssignmentRequest;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.repositories.AssignmentRepository;
 import com.code.auditor.services.AssignmentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/assignment")
 public class AssignmentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);
 
     private final AssignmentService assignmentService;
     private final AssignmentRepository assignmentRepository;
@@ -52,16 +55,19 @@ public class AssignmentController {
         try {
             assignmentService.uploadAssignment(assignmentId, content);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new MessageResponse("ok","Задачата беше предадена успешно!"));
+                    .body(new MessageResponse("ok", "Задачата беше предадена успешно!"));
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new MessageResponse("server_error", "Проблем при качване на файла."));
         } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponse("bad_request","Вече сте предали задача за това задание."));
+                    .body(new MessageResponse("bad_request", "Вече сте предали задача за това задание."));
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("server_error","Неочквана грешка."));
+                    .body(new MessageResponse("server_error", "Неочквана грешка."));
         }
     }
 

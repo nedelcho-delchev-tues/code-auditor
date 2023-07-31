@@ -1,6 +1,7 @@
 package com.code.auditor.domain;
 
 import javax.persistence.*;
+import java.util.Arrays;
 
 @Entity
 @Table(name = "STUDENT_SUBMISSIONS")
@@ -66,5 +67,24 @@ public class StudentSubmission {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "StudentSubmission{" +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
+                ", content=" + Arrays.toString(content) +
+                ", assignment=" + assignment +
+                ", user=" + user +
+                '}';
     }
 }
