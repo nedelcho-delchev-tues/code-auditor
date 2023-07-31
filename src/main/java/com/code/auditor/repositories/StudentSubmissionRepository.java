@@ -6,4 +6,5 @@ import com.code.auditor.domain.StudentSubmission;
 
 @Repository
 public interface StudentSubmissionRepository extends JpaRepository<StudentSubmission, Long> {
+    boolean existsByUserIdAndAssignmentId(Long userId, Long assignmentId);
 }

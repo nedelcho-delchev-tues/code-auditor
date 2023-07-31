@@ -28,6 +28,14 @@ public enum Role {
                     PROFESSOR_UPDATE,
                     PROFESSOR_DELETE
             )
+    ),
+    STUDENT(
+            Set.of(
+                    STUDENT_CREATE,
+                    STUDENT_READ,
+                    STUDENT_UPDATE,
+                    STUDENT_DELETE
+            )
     );
 
     private final Set<Permission> permissions;

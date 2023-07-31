@@ -1,6 +1,6 @@
 package com.code.auditor.configuration;
 
-import com.code.auditor.repositories.StaffRepository;
+import com.code.auditor.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,16 +15,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class ApplicationConfig {
-    private final StaffRepository staffRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ApplicationConfig(StaffRepository staffRepository) {
-        this.staffRepository = staffRepository;
+    public ApplicationConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Bean
     public UserDetailsService userDetailsService(){
-        return email -> staffRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Staff not found"));
+        return email -> userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean

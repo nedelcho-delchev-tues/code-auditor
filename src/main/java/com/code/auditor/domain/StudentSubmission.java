@@ -20,15 +20,15 @@ public class StudentSubmission {
     @Lob
     private byte[] content;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public StudentSubmission(){
+    public StudentSubmission() {
 
     }
 
@@ -60,11 +60,11 @@ public class StudentSubmission {
         this.assignment = assignment;
     }
 
-    public Student getStudent() {
-        return student;
+    public User getUser() {
+        return user;
     }
 
-    public void setStudent(Student student) {
-        this.student = student;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

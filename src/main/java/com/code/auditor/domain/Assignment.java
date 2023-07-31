@@ -11,7 +11,9 @@ import java.util.List;
 @Entity
 public class Assignment {
 
-    /** The id. */
+    /**
+     * The id.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
@@ -38,15 +40,16 @@ public class Assignment {
     @Expose
     private Date modifiedAT;
 
-    @OneToOne(mappedBy = "assignment")
-    private StudentSubmission submissions;
+    @OneToMany(mappedBy = "assignment")
+    private List<StudentSubmission> submissions;
 
     @ManyToOne
-    @JoinColumn(name = "staff_id")
-    @JsonIgnoreProperties({ "firstName", "lastName", "email", "password", "title", "role", "enabled", "accountNonExpired",
-            "accountNonLocked", "credentialsNonExpired", "authorities", "username", "assignments"})
-    @JsonProperty("staff_id")
-    private Staff staff;
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"firstName", "lastName", "email", "password", "title", "role", "enabled", "accountNonExpired",
+            "accountNonLocked", "credentialsNonExpired", "authorities", "username", "assignments", "faculty", "facultyNumber",
+            "specialization", "group", "stream", "submissions"})
+    @JsonProperty("user_id")
+    private User user;
 
     @PrePersist
     protected void prePersist() {
@@ -64,15 +67,15 @@ public class Assignment {
         this.modifiedAT = new Date();
     }
 
-    public Assignment(){
+    public Assignment() {
 
     }
 
-    public Assignment(String title, String description, List<String> specialFiles, Staff staff) {
+    public Assignment(String title, String description, List<String> specialFiles, User user) {
         this.title = title;
         this.description = description;
         this.specialFiles = specialFiles;
-        this.staff = staff;
+        this.user = user;
     }
 
     public Long getId() {
@@ -119,19 +122,19 @@ public class Assignment {
         this.modifiedAT = modifiedAT;
     }
 
-    public StudentSubmission getSubmissions() {
+    public List<StudentSubmission> getSubmissions() {
         return submissions;
     }
 
-    public void setSubmissions(StudentSubmission submissions) {
+    public void setSubmissions(List<StudentSubmission> submissions) {
         this.submissions = submissions;
     }
 
-    public Staff getStaff() {
-        return staff;
+    public User getUser() {
+        return user;
     }
 
-    public void setStaff(Staff staff) {
-        this.staff = staff;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -3,9 +3,9 @@ package com.code.auditor.controllers;
 import com.code.auditor.domain.Assignment;
 import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.dtos.AssignmentRequest;
+import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.repositories.AssignmentRepository;
 import com.code.auditor.services.AssignmentService;
-import com.code.auditor.services.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,12 +21,10 @@ public class AssignmentController {
 
     private final AssignmentService assignmentService;
     private final AssignmentRepository assignmentRepository;
-    private final StudentService studentService;
 
-    public AssignmentController(AssignmentService assignmentService, AssignmentRepository assignmentRepository, StudentService studentService) {
+    public AssignmentController(AssignmentService assignmentService, AssignmentRepository assignmentRepository) {
         this.assignmentService = assignmentService;
         this.assignmentRepository = assignmentRepository;
-        this.studentService = studentService;
     }
 
     @GetMapping()
@@ -43,14 +41,28 @@ public class AssignmentController {
 
     @GetMapping("/find-by-staff/{staffId}")
     public ResponseEntity<List<Assignment>> findAllByStaff(@PathVariable Long staffId) {
-        List<Assignment> assignments = assignmentRepository.findAllByStaffId(staffId);
+        List<Assignment> assignments = assignmentRepository.findAllByUserId(staffId);
         return ResponseEntity.ok(assignments);
     }
 
     //TODO Test
     @PostMapping("{assignmentId}/submit-assignment")
-    public void submitAssignment(@PathVariable Long assignmentId, @RequestBody StudentSubmission studentSubmission) {
-        studentService.uploadAssignment(assignmentId, studentSubmission);
+    public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
+                                                   @RequestPart("file") MultipartFile content) {
+        try {
+            assignmentService.uploadAssignment(assignmentId, content);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new MessageResponse("ok","Задачата беше предадена успешно!"));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("server_error", "Проблем при качване на файла."));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponse("bad_request","Вече сте предали задача за това задание."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse("server_error","Неочквана грешка."));
+        }
     }
 
     @PostMapping()

@@ -1,10 +1,8 @@
 package com.code.auditor.controllers;
 
-import com.code.auditor.domain.Staff;
-import com.code.auditor.domain.Student;
+import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AuthenticationResponse;
 import com.code.auditor.enums.Role;
-import com.code.auditor.repositories.StudentRepository;
 import com.code.auditor.services.AdminService;
 import com.code.auditor.services.AuthenticationService;
 import org.springframework.http.ResponseEntity;
@@ -20,30 +18,22 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AuthenticationService authenticationService;
-    private final StudentRepository studentRepository;
 
-    public AdminController(AdminService adminService, AuthenticationService authenticationService, StudentRepository studentRepository) {
+    public AdminController(AdminService adminService, AuthenticationService authenticationService) {
         this.adminService = adminService;
         this.authenticationService = authenticationService;
-        this.studentRepository = studentRepository;
     }
 
-    @GetMapping("/staff-by-role/{role}")
+    @GetMapping("/user-by-role/{role}")
     @PreAuthorize("hasAuthority('admin:read')")
-    public ResponseEntity<List<Staff>> getAllStaffByRole(@PathVariable String role) {
-        List<Staff> staff = adminService.getStaffByRole(Role.valueOf(role));
-        return ResponseEntity.ok(staff);
+    public ResponseEntity<List<User>> getAllUserByRole(@PathVariable String role) {
+        List<User> users = adminService.getUserByRole(Role.valueOf(role));
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/register-staff")
     @PreAuthorize("hasAuthority('admin:create')")
-    public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody Staff staff) {
-        return ResponseEntity.ok(authenticationService.register(staff));
-    }
-
-    @PostMapping("/all-students")
-    @PreAuthorize("hasAuthority('admin:read') && hasAuthority('professor:read')")
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return ResponseEntity.ok(studentRepository.findAll());
+    public ResponseEntity<AuthenticationResponse> registerStaff(@RequestBody User user) {
+        return ResponseEntity.ok(authenticationService.register(user));
     }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
-    @Query("SELECT a FROM Assignment a WHERE a.staff.id = :staffId")
-    List<Assignment> findAllByStaffId(Long staffId);
+    @Query("SELECT a FROM Assignment a WHERE a.user.id = :userId")
+    List<Assignment> findAllByUserId(Long userId);
+
 }

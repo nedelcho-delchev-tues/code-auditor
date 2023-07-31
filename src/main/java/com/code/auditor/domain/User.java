@@ -1,6 +1,7 @@
 package com.code.auditor.domain;
 
 import com.code.auditor.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.annotations.Expose;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,8 +11,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "STAFF")
-public class Staff implements UserDetails {
+@Table(name = "\"USER\"")
+public class User implements UserDetails {
 
     /**
      * The id.
@@ -22,54 +23,94 @@ public class Staff implements UserDetails {
     private Long id;
 
     /**
-     * The first name of the staff.
+     * The first name of the user.
      */
     @Column(name = "FIRST_NAME", columnDefinition = "VARCHAR", nullable = false)
     @Expose
     private String firstName;
 
     /**
-     * The last name of the staff.
+     * The last name of the user.
      */
     @Column(name = "LAST_NAME", columnDefinition = "VARCHAR", nullable = false)
     @Expose
     private String lastName;
 
     /**
-     * The email of the staff.
+     * The email of the user.
      */
     @Column(nullable = false, unique = true)
     @Expose
     private String email;
 
     /**
-     * The password of the staff.
+     * The password of the user.
      */
     @Column(nullable = false)
     private String password;
-
-    /**
-     * The title of the staff.
-     */
-    @Expose
-    private String title;
 
     @Enumerated(EnumType.ORDINAL)
     @Expose
     @Column(name = "ROLE", columnDefinition = "VARCHAR", nullable = false)
     private Role role;
 
-    @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
+    /**
+     * The title of the user.
+     */
+    @Expose
+    private String title;
+
+    /**
+     * The faculty of the student.
+     */
+    @Column(name = "FACULTY")
+    @Expose
+    private String faculty;
+
+    /**
+     * The faculty number of the student.
+     */
+    @Column(name = "FACULTY_NUMBER")
+    @Expose
+    private String facultyNumber;
+
+    /**
+     * The specialization of the student.
+     */
+    @Column(name = "SPECIALIZATION")
+    @Expose
+    private String specialization;
+
+    /**
+     * The group of the student.
+     */
+    @Column(name = "STUDENT_GROUP")
+    @Expose
+    private String group;
+
+    /**
+     * The stream of the student.
+     */
+    @Column(name = "STUDENT_STREAM")
+    @Expose
+    private String stream;
+
+    @OneToMany(mappedBy = "user")
+    private List<StudentSubmission> submissions;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Assignment> assignments;
 
-    @OneToMany(mappedBy = "staff")
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Token> tokens;
 
-    public Staff() {
+    public User() {
 
     }
 
-    public Staff(String firstName, String lastName, String email, String password, Role role) {
+    public User(String firstName, String lastName, String email, String password, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -131,6 +172,62 @@ public class Staff implements UserDetails {
 
     public void setAssignments(List<Assignment> assignments) {
         this.assignments = assignments;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+
+    public String getFacultyNumber() {
+        return facultyNumber;
+    }
+
+    public void setFacultyNumber(String facultyNumber) {
+        this.facultyNumber = facultyNumber;
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public String getStream() {
+        return stream;
+    }
+
+    public void setStream(String stream) {
+        this.stream = stream;
+    }
+
+    public List<StudentSubmission> getSubmissions() {
+        return submissions;
+    }
+
+    public void setSubmissions(List<StudentSubmission> submissions) {
+        this.submissions = submissions;
+    }
+
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens = tokens;
     }
 
     @Override

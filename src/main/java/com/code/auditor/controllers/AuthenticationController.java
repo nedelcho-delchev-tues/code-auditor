@@ -1,8 +1,9 @@
 package com.code.auditor.controllers;
 
-import com.code.auditor.domain.Student;
+import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AuthenticationResponse;
 import com.code.auditor.dtos.AuthenticationRequest;
+import com.code.auditor.enums.Role;
 import com.code.auditor.services.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,13 +25,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> registerStudent(@RequestBody Student student) {
-        return ResponseEntity.ok(authenticationService.register(student));
+    public ResponseEntity<AuthenticationResponse> registerStudent(@RequestBody User user) {
+        user.setRole(Role.STUDENT);
+        return ResponseEntity.ok(authenticationService.register(user));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticateStaff(request));
+        return ResponseEntity.ok(authenticationService.authenticateUser(request));
     }
 
     @PostMapping("/logout")
