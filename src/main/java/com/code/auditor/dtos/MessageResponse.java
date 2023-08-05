@@ -1,19 +1,19 @@
 package com.code.auditor.dtos;
 
 public class MessageResponse {
-    private String status;
+    private int status;
     private String message;
 
-    public MessageResponse(String status, String message) {
+    public MessageResponse(int status, String message) {
         this.status = status;
         this.message = message;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

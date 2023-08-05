@@ -48,26 +48,26 @@ public class AssignmentController {
         return ResponseEntity.ok(assignments);
     }
 
-    //TODO Test
+    //TODO Make custom exceptions
     @PostMapping("{assignmentId}/submit-assignment")
     public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
                                                    @RequestPart("file") MultipartFile content) {
         try {
             assignmentService.uploadAssignment(assignmentId, content);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new MessageResponse("ok", "Задачата беше предадена успешно!"));
+                    .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("server_error", "Проблем при качване на файла."));
+                    .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Проблем при качване на файла."));
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponse("bad_request", "Вече сте предали задача за това задание."));
+                    .body(new MessageResponse(HttpStatus.BAD_REQUEST.value(), "Вече сте предали задача за това задание."));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("server_error", "Неочквана грешка."));
+                    .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Неочквана грешка."));
         }
     }
 

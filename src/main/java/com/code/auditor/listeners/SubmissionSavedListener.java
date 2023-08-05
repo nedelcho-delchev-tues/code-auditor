@@ -6,13 +6,11 @@ import com.code.auditor.repositories.StudentSubmissionRepository;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.CharsetNames;
-import org.apache.commons.digester.annotations.rules.SetProperty;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -26,8 +24,8 @@ import java.util.zip.ZipInputStream;
 public class SubmissionSavedListener {
 
     private static final Logger logger = LoggerFactory.getLogger(SubmissionSavedListener.class);
-    private final StudentSubmissionRepository studentSubmissionRepository;
     private static final String mavenHome = System.getenv("MAVEN_HOME");
+    private final StudentSubmissionRepository studentSubmissionRepository;
 
     public SubmissionSavedListener(StudentSubmissionRepository studentSubmissionRepository) {
         this.studentSubmissionRepository = studentSubmissionRepository;

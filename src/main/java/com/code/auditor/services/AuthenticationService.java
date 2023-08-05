@@ -6,9 +6,11 @@ import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AuthenticationRequest;
 import com.code.auditor.dtos.AuthenticationResponse;
 import com.code.auditor.enums.TokenType;
+import com.code.auditor.exceptions.InvalidEmailException;
 import com.code.auditor.repositories.TokenRepository;
 import com.code.auditor.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,6 +40,11 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(User user) {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+
+        if(!isValidEmail(user.getEmail())){
+            throw new InvalidEmailException("Невалиден имейл");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
@@ -61,6 +68,10 @@ public class AuthenticationService {
         authenticationResponse.setAccessToken(jwtToken);
         authenticationResponse.setRefreshToken(refreshToken);
         return authenticationResponse;
+    }
+
+    private boolean isValidEmail(String email) {
+        return EmailValidator.getInstance().isValid(email);
     }
 
     private void saveUserToken(User user, String jwtToken) {

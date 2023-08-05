@@ -1,12 +1,14 @@
 package com.code.auditor.domain;
 
 import com.code.auditor.enums.Role;
+import com.code.auditor.validation.ValidEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.annotations.Expose;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,15 +43,17 @@ public class User implements UserDetails {
      */
     @Column(nullable = false, unique = true)
     @Expose
+    @ValidEmail
     private String email;
 
     /**
      * The password of the user.
      */
     @Column(nullable = false)
+    @Size(min = 6, message = "Паролата трябва да е поне дълга поне 6 знака")
     private String password;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Expose
     @Column(name = "ROLE", columnDefinition = "VARCHAR", nullable = false)
     private Role role;

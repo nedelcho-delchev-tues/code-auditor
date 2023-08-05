@@ -3,8 +3,11 @@ package com.code.auditor.controllers;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AuthenticationResponse;
 import com.code.auditor.dtos.AuthenticationRequest;
+import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
+import com.code.auditor.exceptions.InvalidEmailException;
 import com.code.auditor.services.AuthenticationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +28,17 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> registerStudent(@RequestBody User user) {
-        user.setRole(Role.STUDENT);
-        return ResponseEntity.ok(authenticationService.register(user));
+    public ResponseEntity<Object> registerStudent(@RequestBody User user) {
+        try {
+            user.setRole(Role.STUDENT);
+            return ResponseEntity.ok(authenticationService.register(user));
+        }catch (InvalidEmailException e) {
+            MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")

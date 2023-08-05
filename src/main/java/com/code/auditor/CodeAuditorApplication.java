@@ -20,8 +20,8 @@ public class CodeAuditorApplication {
     @Bean
     public CommandLineRunner commandLineRunner(AuthenticationService service) {
         return args -> {
-            User admin = new User("admin", "admin", "admin@codeauditor.com", "123456", Role.ADMIN);
             User student = new User("user", "user", "user@codeauditor.com", "123456", Role.STUDENT);
+            User admin = new User("admin", "admin", "admin@codeauditor.com", "123456", Role.ADMIN);
 
             System.out.println("Student token: " + service.register(student).getAccessToken());
             System.out.println("Admin token: " + service.register(admin).getAccessToken());
