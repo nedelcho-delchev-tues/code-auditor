@@ -12,14 +12,16 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class LogoutService implements LogoutHandler {
     private final TokenRepository tokenRepository;
+
     public LogoutService(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
     }
+
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
         jwt = authHeader.substring(7);

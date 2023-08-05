@@ -7,7 +7,14 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.shared.invoker.*;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -46,7 +53,9 @@ public class SubmissionSavedListener {
             unzipProject(ss.getContent(), tempDir);
 
             String mavenProjectDir = tempDir + FilenameUtils.removeExtension(ss.getFileName());
+            String mavenProjectPom = mavenProjectDir + File.separator + "pom.xml";
 
+            addSpotBugsPlugin(mavenProjectPom);
             executeExtractedProject(mavenProjectDir);
 
         } catch (Exception e) {
@@ -138,5 +147,55 @@ public class SubmissionSavedListener {
             System.err.println("Error executing Maven command: " + e.getMessage());
             throw new Exception("Build has failed !" + e.getMessage());
         }
+    }
+
+    private void addSpotBugsPlugin(String pomFilePath) {
+        try {
+            String configuration = "<configuration> " +
+                    "<effort>default</effort> " +
+                    "<reportLevel>high</reportLevel> " +
+                    "<htmlOutput>true</htmlOutput> " +
+                    "<failOnError>false</failOnError>"+
+                    "</configuration>";
+            Model model = parsePomXmlFileToMavenPomModel(pomFilePath);
+
+            Xpp3Dom pluginConfiguration = Xpp3DomBuilder.build(new StringReader(configuration));
+
+            List<PluginExecution> pluginExecutions = new ArrayList<>();
+            PluginExecution pluginExecution = new PluginExecution();
+            pluginExecution.addGoal("check");
+            pluginExecution.setPhase("install");
+            pluginExecutions.add(pluginExecution);
+
+            Plugin spotBugs = new Plugin();
+            spotBugs.setGroupId("com.github.spotbugs");
+            spotBugs.setArtifactId("spotbugs-maven-plugin");
+            spotBugs.setVersion("4.7.3.5");
+            spotBugs.setConfiguration(pluginConfiguration);
+            spotBugs.setExecutions(pluginExecutions);
+
+            model.getBuild().addPlugin(spotBugs);
+
+            parseMavenPomModelToXmlString(pomFilePath, model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Model parsePomXmlFileToMavenPomModel(String path) throws Exception {
+        Model model;
+        FileReader reader;
+
+        MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+        reader = new FileReader(path);
+        model = mavenReader.read(reader);
+
+        return model;
+    }
+
+    private void parseMavenPomModelToXmlString(String path, Model model) throws Exception {
+        MavenXpp3Writer mavenWriter = new MavenXpp3Writer();
+        Writer writer = new FileWriter(path);
+        mavenWriter.write(writer, model);
     }
 }

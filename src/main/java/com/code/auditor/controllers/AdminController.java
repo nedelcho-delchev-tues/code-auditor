@@ -4,6 +4,7 @@ import com.code.auditor.domain.User;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
 import com.code.auditor.exceptions.InvalidEmailException;
+import com.code.auditor.exceptions.InvalidPasswordException;
 import com.code.auditor.services.AdminService;
 import com.code.auditor.services.AuthenticationService;
 import org.springframework.http.HttpStatus;
@@ -29,17 +30,20 @@ public class AdminController {
 
     @GetMapping("/user-by-role/{role}")
     @PreAuthorize("hasAuthority('admin:read')")
-    public ResponseEntity<List<User>> getAllUserByRole(@PathVariable String role) {
+    public ResponseEntity<Object> getAllUserByRole(@PathVariable String role) {
         try {
             Role userRole = Role.valueOf(role.toUpperCase());
             List<User> users = adminService.getUserByRole(userRole);
             if (users.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.OK).body(null);
             }
-            return ResponseEntity.ok(users);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.OK).body(users);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new MessageResponse(HttpStatus.BAD_REQUEST.value(), "Грешка с подадената роля"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Неочаквана грешка:" + e.getMessage()));
         }
     }
 
@@ -48,11 +52,10 @@ public class AdminController {
     public ResponseEntity<Object> registerStaff(@RequestBody User user) {
         try {
             return ResponseEntity.ok(authenticationService.register(user));
-        } catch (InvalidEmailException e) {
+        } catch (InvalidEmailException | InvalidPasswordException e) {
             MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }catch (Exception e) {
-            //TODO less generic exception
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
         }

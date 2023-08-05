@@ -7,6 +7,7 @@ import com.code.auditor.dtos.AuthenticationRequest;
 import com.code.auditor.dtos.AuthenticationResponse;
 import com.code.auditor.enums.TokenType;
 import com.code.auditor.exceptions.InvalidEmailException;
+import com.code.auditor.exceptions.InvalidPasswordException;
 import com.code.auditor.repositories.TokenRepository;
 import com.code.auditor.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,8 @@ import java.io.IOException;
 
 @Service
 public class AuthenticationService {
+
+    private static final int MIN_CHAR_FOR_PASSWORD = 6;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -43,6 +46,10 @@ public class AuthenticationService {
 
         if(!isValidEmail(user.getEmail())){
             throw new InvalidEmailException("Невалиден имейл");
+        }
+
+        if (user.getPassword().length() < MIN_CHAR_FOR_PASSWORD){
+            throw new InvalidPasswordException("Невалидна парола. Паролата трябва да е минимум 6 символа");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

@@ -6,6 +6,7 @@ import com.code.auditor.dtos.AuthenticationRequest;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
 import com.code.auditor.exceptions.InvalidEmailException;
+import com.code.auditor.exceptions.InvalidPasswordException;
 import com.code.auditor.services.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,27 +33,17 @@ public class AuthenticationController {
         try {
             user.setRole(Role.STUDENT);
             return ResponseEntity.ok(authenticationService.register(user));
-        }catch (InvalidEmailException e) {
-            MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+        } catch (InvalidEmailException | InvalidPasswordException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticateUser(request));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            return ResponseEntity.ok("Logged out successfully");
-        }
-        return ResponseEntity.badRequest().body("Already logout or bad token");
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticateUser(request));
     }
 
     @PostMapping("/refresh_token")

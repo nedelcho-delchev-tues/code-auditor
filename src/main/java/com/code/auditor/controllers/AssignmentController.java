@@ -3,6 +3,7 @@ package com.code.auditor.controllers;
 import com.code.auditor.domain.Assignment;
 import com.code.auditor.dtos.AssignmentRequest;
 import com.code.auditor.dtos.MessageResponse;
+import com.code.auditor.exceptions.SubmissionSubmittedException;
 import com.code.auditor.repositories.AssignmentRepository;
 import com.code.auditor.services.AssignmentService;
 import org.slf4j.Logger;
@@ -58,41 +59,40 @@ public class AssignmentController {
                     .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Проблем при качване на файла."));
-        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Проблем при качване на файла."));
+        } catch (SubmissionSubmittedException e) {
             logger.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponse(HttpStatus.BAD_REQUEST.value(), "Вече сте предали задача за това задание."));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Неочквана грешка."));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Неочаквана грешка"));
         }
     }
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN') || hasRole('PROFESSOR')")
-    public ResponseEntity<String> createAssignment(@RequestBody AssignmentRequest assignmentRequest) {
+    public ResponseEntity<Object> createAssignment(@RequestBody AssignmentRequest assignmentRequest) {
         assignmentService.createAssignment(assignmentRequest);
-        return new ResponseEntity<>(
-                "Заданието беше създадено успешно !",
-                HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Заданието беше създадено успешно."));
     }
 
     @PutMapping("{assignmentId}")
     @PreAuthorize("hasRole('ADMIN') || hasRole('PROFESSOR')")
-    public ResponseEntity<String> updateAssignment(@PathVariable Long assignmentId, @RequestBody AssignmentRequest assignmentRequest) {
+    public ResponseEntity<Object> updateAssignment(@PathVariable Long assignmentId, @RequestBody AssignmentRequest assignmentRequest) {
         assignmentService.updateAssignment(assignmentId, assignmentRequest);
-        return new ResponseEntity<>(
-                "Заданието беше обновено успешно !",
-                HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Заданието беше обновено успешно."));
     }
 
     @DeleteMapping("{assignmentId}")
     @PreAuthorize("hasRole('ADMIN') || hasRole('PROFESSOR')")
-    public ResponseEntity<String> deleteAssignment(@PathVariable Long assignmentId) {
+    public ResponseEntity<Object> deleteAssignment(@PathVariable Long assignmentId) {
         assignmentRepository.deleteById(assignmentId);
-        return ResponseEntity.ok("Заданието беше изтрито успешно");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Заданието беше изтрито успешно."));
     }
 }

@@ -6,6 +6,7 @@ import com.code.auditor.domain.Assignment;
 import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AssignmentRequest;
+import com.code.auditor.exceptions.SubmissionSubmittedException;
 import com.code.auditor.repositories.AssignmentRepository;
 import com.code.auditor.repositories.StudentSubmissionRepository;
 import com.code.auditor.repositories.UserRepository;
@@ -63,8 +64,9 @@ public class AssignmentService {
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow();
 
         if (hasSubmittedAssignment(user.getId(), assignmentId)) {
-            throw new IllegalArgumentException("Student has already submitted an assignment for this assignment.");
+            throw new SubmissionSubmittedException("Вече сте предали решение за тази задача.");
         }
+
 
         StudentSubmission studentSubmission = new StudentSubmission();
 
