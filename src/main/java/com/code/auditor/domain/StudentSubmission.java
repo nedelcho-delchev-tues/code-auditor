@@ -1,6 +1,11 @@
 package com.code.auditor.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.util.Arrays;
 
 @Entity
@@ -19,6 +24,7 @@ public class StudentSubmission {
     private String fileName;
 
     @Lob
+    @JsonIgnore
     private byte[] content;
 
     @ManyToOne
@@ -82,7 +88,6 @@ public class StudentSubmission {
         return "StudentSubmission{" +
                 "id=" + id +
                 ", fileName='" + fileName + '\'' +
-                ", content=" + Arrays.toString(content) +
                 ", assignment=" + assignment +
                 ", user=" + user +
                 '}';

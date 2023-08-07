@@ -3,8 +3,8 @@ package com.code.auditor.services;
 import com.code.auditor.configuration.JwtService;
 import com.code.auditor.domain.Token;
 import com.code.auditor.domain.User;
-import com.code.auditor.dtos.AuthenticationRequest;
-import com.code.auditor.dtos.AuthenticationResponse;
+import com.code.auditor.dtos.AuthenticationRequestDTO;
+import com.code.auditor.dtos.AuthenticationResponseDTO;
 import com.code.auditor.enums.TokenType;
 import com.code.auditor.exceptions.InvalidEmailException;
 import com.code.auditor.exceptions.InvalidPasswordException;
@@ -41,8 +41,8 @@ public class AuthenticationService {
         this.tokenRepository = tokenRepository;
     }
 
-    public AuthenticationResponse register(User user) {
-        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+    public AuthenticationResponseDTO register(User user) {
+        AuthenticationResponseDTO authenticationResponse = new AuthenticationResponseDTO();
 
         if(!isValidEmail(user.getEmail())){
             throw new InvalidEmailException("Невалиден имейл");
@@ -62,8 +62,8 @@ public class AuthenticationService {
         return authenticationResponse;
     }
 
-    public AuthenticationResponse authenticateUser(AuthenticationRequest request) {
-        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+    public AuthenticationResponseDTO authenticateUser(AuthenticationRequestDTO request) {
+        AuthenticationResponseDTO authenticationResponse = new AuthenticationResponseDTO();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
@@ -121,7 +121,7 @@ public class AuthenticationService {
                 var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+                AuthenticationResponseDTO authenticationResponse = new AuthenticationResponseDTO();
                 authenticationResponse.setAccessToken(accessToken);
                 authenticationResponse.setRefreshToken(refreshToken);
                 new ObjectMapper().writeValue(response.getOutputStream(), authenticationResponse);

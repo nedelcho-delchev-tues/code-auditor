@@ -1,8 +1,8 @@
 package com.code.auditor.controllers;
 
 import com.code.auditor.domain.User;
-import com.code.auditor.dtos.AuthenticationResponse;
-import com.code.auditor.dtos.AuthenticationRequest;
+import com.code.auditor.dtos.AuthenticationResponseDTO;
+import com.code.auditor.dtos.AuthenticationRequestDTO;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
 import com.code.auditor.exceptions.InvalidEmailException;
@@ -30,19 +30,12 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerStudent(@RequestBody User user) {
-        try {
             user.setRole(Role.STUDENT);
             return ResponseEntity.ok(authenticationService.register(user));
-        } catch (InvalidEmailException | InvalidPasswordException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponseDTO> authenticate(@RequestBody AuthenticationRequestDTO request) {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticateUser(request));
     }
 

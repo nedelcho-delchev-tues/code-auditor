@@ -5,37 +5,36 @@ import com.code.auditor.configuration.RabbitMQConfig;
 import com.code.auditor.domain.Assignment;
 import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.domain.User;
-import com.code.auditor.dtos.AssignmentRequest;
+import com.code.auditor.dtos.AssignmentRequestDTO;
+import com.code.auditor.dtos.StudentSubmissionDTO;
 import com.code.auditor.exceptions.SubmissionSubmittedException;
 import com.code.auditor.repositories.AssignmentRepository;
 import com.code.auditor.repositories.StudentSubmissionRepository;
-import com.code.auditor.repositories.UserRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 
 @Service
 public class AssignmentService {
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final AssignmentRepository assignmentRepository;
     private final StudentSubmissionRepository studentSubmissionRepository;
     private final RabbitTemplate rabbitTemplate;
 
-    public AssignmentService(JwtService jwtService, UserRepository userRepository, AssignmentRepository assignmentRepository, StudentSubmissionRepository studentSubmissionRepository, RabbitTemplate rabbitTemplate) {
+    public AssignmentService(JwtService jwtService, AssignmentRepository assignmentRepository,
+                             StudentSubmissionRepository studentSubmissionRepository, RabbitTemplate rabbitTemplate) {
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
         this.studentSubmissionRepository = studentSubmissionRepository;
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void createAssignment(AssignmentRequest assignmentCreationRequest) {
-        User obj = (User) jwtService.extractEmailFromRequest();
-        User user = userRepository.findByEmail(obj.getEmail()).orElseThrow();
+    public void createAssignment(AssignmentRequestDTO assignmentCreationRequest) {
+        User user = jwtService.getUserByRequest();
 
         Assignment assignment = new Assignment(
                 assignmentCreationRequest.getTitle(),
@@ -47,7 +46,7 @@ public class AssignmentService {
         assignmentRepository.save(assignment);
     }
 
-    public void updateAssignment(Long assignmentId, AssignmentRequest updatedAssignment) {
+    public void updateAssignment(Long assignmentId, AssignmentRequestDTO updatedAssignment) {
         Assignment existingAssignment = assignmentRepository.findById(assignmentId).orElse(null);
         if (existingAssignment == null) {
             return;
@@ -59,8 +58,7 @@ public class AssignmentService {
     }
 
     public void uploadAssignment(Long assignmentId, MultipartFile content) throws IOException {
-        User obj = (User) jwtService.extractEmailFromRequest();
-        User user = userRepository.findByEmail(obj.getEmail()).orElseThrow();
+        User user = jwtService.getUserByRequest();
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow();
 
         if (hasSubmittedAssignment(user.getId(), assignmentId)) {
@@ -79,8 +77,18 @@ public class AssignmentService {
         rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, "submission.saved", ss.getId());
     }
 
+    @Transactional
+    public StudentSubmissionDTO getStudentSubmissionByAssignment(Long assignmentId){
+        User user = jwtService.getUserByRequest();
+        return studentSubmissionRepository.getByUserIdAndAssignmentId(assignmentId, user.getId()).orElseThrow();
+    }
+
+    public void deleteSubmissionByStudent(Long assignmentId){
+        User user = jwtService.getUserByRequest();
+        studentSubmissionRepository.deleteByUserIdAndAssignmentId(assignmentId, user.getId());
+    }
+
     private boolean hasSubmittedAssignment(Long userId, Long assignmentId) {
         return studentSubmissionRepository.existsByUserIdAndAssignmentId(userId, assignmentId);
     }
-
 }

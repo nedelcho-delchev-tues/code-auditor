@@ -2,7 +2,7 @@ package com.code.auditor.dtos;
 
 import java.util.List;
 
-public class AssignmentRequest {
+public class AssignmentRequestDTO {
     private String title;
     private String description;
     private List<String> specialFiles;

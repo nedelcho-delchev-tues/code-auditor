@@ -50,14 +50,6 @@ public class AdminController {
     @PostMapping("/register-staff")
     @PreAuthorize("hasAuthority('admin:create')")
     public ResponseEntity<Object> registerStaff(@RequestBody User user) {
-        try {
-            return ResponseEntity.ok(authenticationService.register(user));
-        } catch (InvalidEmailException | InvalidPasswordException e) {
-            MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(authenticationService.register(user));
     }
 }

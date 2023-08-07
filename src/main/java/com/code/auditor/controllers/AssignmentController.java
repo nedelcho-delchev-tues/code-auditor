@@ -1,9 +1,9 @@
 package com.code.auditor.controllers;
 
 import com.code.auditor.domain.Assignment;
-import com.code.auditor.dtos.AssignmentRequest;
+import com.code.auditor.dtos.AssignmentRequestDTO;
 import com.code.auditor.dtos.MessageResponse;
-import com.code.auditor.exceptions.SubmissionSubmittedException;
+import com.code.auditor.dtos.StudentSubmissionDTO;
 import com.code.auditor.repositories.AssignmentRepository;
 import com.code.auditor.services.AssignmentService;
 import org.slf4j.Logger;
@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/assignment")
@@ -43,28 +44,15 @@ public class AssignmentController {
         return ResponseEntity.ok(assignment);
     }
 
-    @GetMapping("/find-by-staff/{staffId}")
-    public ResponseEntity<List<Assignment>> findAllByStaff(@PathVariable Long staffId) {
-        List<Assignment> assignments = assignmentRepository.findAllByUserId(staffId);
-        return ResponseEntity.ok(assignments);
-    }
-
-    //TODO Make custom exceptions
-    @PostMapping("{assignmentId}/submit-assignment")
-    public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
-                                                   @RequestPart("file") MultipartFile content) {
+    @GetMapping("{assignmentId}/get_submission")
+    public ResponseEntity<Object> getStudentSubmission(@PathVariable Long assignmentId) {
         try {
-            assignmentService.uploadAssignment(assignmentId, content);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
-        } catch (IOException e) {
+            StudentSubmissionDTO studentSubmission = assignmentService.getStudentSubmissionByAssignment(assignmentId);
+            return ResponseEntity.ok(studentSubmission);
+        } catch (NoSuchElementException e) {
             logger.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Проблем при качване на файла."));
-        } catch (SubmissionSubmittedException e) {
-            logger.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new MessageResponse(HttpStatus.NOT_FOUND.value(), "Не е намерана задача отговаряща на изискванията."));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
@@ -72,9 +60,31 @@ public class AssignmentController {
         }
     }
 
+    @PostMapping("{assignmentId}/submit-assignment")
+    public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
+                                                   @RequestPart("file") MultipartFile content) throws IOException {
+            assignmentService.uploadAssignment(assignmentId, content);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
+
+    }
+
+    @DeleteMapping("{assignmentId}/delete_submission")
+    public ResponseEntity<Object> deleteStudentSubmission(@PathVariable Long assignmentId) {
+        assignmentService.deleteSubmissionByStudent(assignmentId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше изтрита успешно."));
+    }
+
+    @GetMapping("/find-by-staff/{staffId}")
+    public ResponseEntity<List<Assignment>> findAllByStaff(@PathVariable Long staffId) {
+        List<Assignment> assignments = assignmentRepository.findAllByUserId(staffId);
+        return ResponseEntity.ok(assignments);
+    }
+
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN') || hasRole('PROFESSOR')")
-    public ResponseEntity<Object> createAssignment(@RequestBody AssignmentRequest assignmentRequest) {
+    public ResponseEntity<Object> createAssignment(@RequestBody AssignmentRequestDTO assignmentRequest) {
         assignmentService.createAssignment(assignmentRequest);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new MessageResponse(HttpStatus.OK.value(), "Заданието беше създадено успешно."));
@@ -82,7 +92,7 @@ public class AssignmentController {
 
     @PutMapping("{assignmentId}")
     @PreAuthorize("hasRole('ADMIN') || hasRole('PROFESSOR')")
-    public ResponseEntity<Object> updateAssignment(@PathVariable Long assignmentId, @RequestBody AssignmentRequest assignmentRequest) {
+    public ResponseEntity<Object> updateAssignment(@PathVariable Long assignmentId, @RequestBody AssignmentRequestDTO assignmentRequest) {
         assignmentService.updateAssignment(assignmentId, assignmentRequest);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new MessageResponse(HttpStatus.OK.value(), "Заданието беше обновено успешно."));

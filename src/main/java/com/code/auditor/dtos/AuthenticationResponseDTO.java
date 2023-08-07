@@ -2,7 +2,7 @@ package com.code.auditor.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AuthenticationResponse {
+public class AuthenticationResponseDTO {
     @JsonProperty("access_token")
     private String accessToken;
     @JsonProperty("refresh_token")
@@ -26,7 +26,7 @@ public class AuthenticationResponse {
 
     @Override
     public String toString() {
-        return "AuthenticationResponse{" +
+        return "AuthenticationResponseDTO{" +
                 "accessToken='" + accessToken + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 '}';

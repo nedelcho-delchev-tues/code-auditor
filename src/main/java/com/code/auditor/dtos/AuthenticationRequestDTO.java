@@ -1,6 +1,6 @@
 package com.code.auditor.dtos;
 
-public class AuthenticationRequest {
+public class AuthenticationRequestDTO {
     private String email;
     private String password;
 
