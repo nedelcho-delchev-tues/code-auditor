@@ -43,16 +43,18 @@ public class SubmissionSavedListener {
         try {
             StudentSubmission ss = studentSubmissionRepository.findById(submissionID).orElseThrow();
             if (!checkIfSpecialFilesPresent(ss)) {
-                // save into future AssignmentProblems table
+                // save into future AssignmentProblems table`
                 logger.error("files are not present");
             }
 
             logger.info("all files are present");
 
             String tempDir = System.getProperty("java.io.tmpdir");
-            unzipProject(ss.getContent(), tempDir);
 
-            String mavenProjectDir = tempDir + FilenameUtils.removeExtension(ss.getFileName());
+            //Project name might be different from zip name
+            String projectName = unzipProjectAndGetParentDirName(ss.getContent(), tempDir);
+
+            String mavenProjectDir = tempDir + FilenameUtils.removeExtension(projectName);
             String mavenProjectPom = mavenProjectDir + File.separator + "pom.xml";
 
             addSpotBugsPlugin(mavenProjectPom);
@@ -93,13 +95,11 @@ public class SubmissionSavedListener {
         return fullPath.substring(fullPath.lastIndexOf('/') + 1);
     }
 
-    private void unzipProject(byte[] submissionContent, String destinationDir) {
+    private String unzipProjectAndGetParentDirName(byte[] submissionContent, String destinationDir) {
+        String parentDirName = null;
         byte[] buffer = new byte[1024];
         ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(
-                new ByteArrayInputStream(submissionContent),
-                CharsetNames.UTF_8,
-                true,
-                true);
+                new ByteArrayInputStream(submissionContent));
 
         try (zipInputStream) {
             ZipArchiveEntry entry = zipInputStream.getNextZipEntry();
@@ -113,14 +113,16 @@ public class SubmissionSavedListener {
                             fos.write(buffer, 0, length);
                         }
                     }
+                } else if (parentDirName == null) {
+                    parentDirName = entry.getName();
                 }
                 entry = zipInputStream.getNextZipEntry();
             }
         } catch (IOException e) {
-            logger.error(String.valueOf(e));
             e.printStackTrace();
         }
 
+        return parentDirName;
     }
 
     private void executeExtractedProject(String workingDir) throws Exception {
