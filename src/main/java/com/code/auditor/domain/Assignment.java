@@ -11,9 +11,6 @@ import java.util.List;
 @Entity
 public class Assignment {
 
-    /**
-     * The id.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)

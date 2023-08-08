@@ -3,16 +3,13 @@ package com.code.auditor.controllers;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
-import com.code.auditor.exceptions.InvalidEmailException;
-import com.code.auditor.exceptions.InvalidPasswordException;
-import com.code.auditor.services.AdminService;
+import com.code.auditor.services.UserService;
 import com.code.auditor.services.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -20,10 +17,10 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN') && hasRole('PROFESSOR')")
 public class AdminController {
 
-    private final AdminService adminService;
+    private final UserService adminService;
     private final AuthenticationService authenticationService;
 
-    public AdminController(AdminService adminService, AuthenticationService authenticationService) {
+    public AdminController(UserService adminService, AuthenticationService authenticationService) {
         this.adminService = adminService;
         this.authenticationService = authenticationService;
     }

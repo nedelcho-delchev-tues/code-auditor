@@ -3,12 +3,14 @@ package com.code.auditor.services;
 import com.code.auditor.configuration.JwtService;
 import com.code.auditor.configuration.RabbitMQConfig;
 import com.code.auditor.domain.Assignment;
+import com.code.auditor.domain.Feedback;
 import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AssignmentRequestDTO;
 import com.code.auditor.dtos.StudentSubmissionDTO;
 import com.code.auditor.exceptions.SubmissionSubmittedException;
 import com.code.auditor.repositories.AssignmentRepository;
+import com.code.auditor.repositories.FeedbackRepository;
 import com.code.auditor.repositories.StudentSubmissionRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class AssignmentService {
@@ -23,13 +26,15 @@ public class AssignmentService {
     private final JwtService jwtService;
     private final AssignmentRepository assignmentRepository;
     private final StudentSubmissionRepository studentSubmissionRepository;
+    private final FeedbackRepository feedbackRepository;
     private final RabbitTemplate rabbitTemplate;
 
     public AssignmentService(JwtService jwtService, AssignmentRepository assignmentRepository,
-                             StudentSubmissionRepository studentSubmissionRepository, RabbitTemplate rabbitTemplate) {
+                             StudentSubmissionRepository studentSubmissionRepository, FeedbackRepository feedbackRepository, RabbitTemplate rabbitTemplate) {
         this.jwtService = jwtService;
         this.assignmentRepository = assignmentRepository;
         this.studentSubmissionRepository = studentSubmissionRepository;
+        this.feedbackRepository = feedbackRepository;
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -80,7 +85,10 @@ public class AssignmentService {
     @Transactional
     public StudentSubmissionDTO getStudentSubmissionByAssignment(Long assignmentId){
         User user = jwtService.getUserByRequest();
-        return studentSubmissionRepository.getByUserIdAndAssignmentId(assignmentId, user.getId()).orElseThrow();
+        StudentSubmissionDTO studentSubmissionDTO = studentSubmissionRepository.getByUserIdAndAssignmentId(assignmentId, user.getId()).orElseThrow();
+        List<Feedback> feedbacks = feedbackRepository.findByStudentSubmissionId(studentSubmissionDTO.getId());
+        studentSubmissionDTO.setFeedbacks(feedbacks);
+        return studentSubmissionDTO;
     }
 
     public void deleteSubmissionByStudent(Long assignmentId){

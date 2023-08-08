@@ -1,12 +1,11 @@
 package com.code.auditor.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.transaction.Transactional;
-import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Table(name = "STUDENT_SUBMISSIONS")
@@ -34,6 +33,10 @@ public class StudentSubmission {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "studentSubmission", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Feedback> feedbacks;
 
     public StudentSubmission() {
 
@@ -81,6 +84,14 @@ public class StudentSubmission {
 
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
     }
 
     @Override

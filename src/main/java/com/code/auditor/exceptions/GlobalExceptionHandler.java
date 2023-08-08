@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.NoSuchElementException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -33,6 +35,13 @@ public class GlobalExceptionHandler {
         MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<MessageResponse> handleSubmissionSubmitted(NoSuchElementException e) {
+        MessageResponse errorResponse = new MessageResponse(HttpStatus.NOT_FOUND.value(), "Не е намерен такъв елемент.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
 
     // TODO Add other exception handlers for registration
 }
