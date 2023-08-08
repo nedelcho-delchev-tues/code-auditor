@@ -1,5 +1,6 @@
 package com.code.auditor.controllers;
 
+import com.code.auditor.configuration.JwtService;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
@@ -13,20 +14,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin")
-@PreAuthorize("hasRole('ADMIN') && hasRole('PROFESSOR')")
-public class AdminController {
+@RequestMapping("/api/v1/")
+public class UserController {
 
     private final UserService adminService;
     private final AuthenticationService authenticationService;
+    private final JwtService jwtService;
 
-    public AdminController(UserService adminService, AuthenticationService authenticationService) {
+    public UserController(UserService adminService, AuthenticationService authenticationService, JwtService jwtService) {
         this.adminService = adminService;
         this.authenticationService = authenticationService;
+        this.jwtService = jwtService;
     }
 
-    @GetMapping("/user-by-role/{role}")
-    @PreAuthorize("hasAuthority('admin:read')")
+    @GetMapping("user/")
+    public ResponseEntity<Object> getUserInfoFromJwt(){
+        return ResponseEntity.ok(jwtService.getUserByRequest());
+    }
+
+    @GetMapping("admin/user-by-role/{role}")
+    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
     public ResponseEntity<Object> getAllUserByRole(@PathVariable String role) {
         try {
             Role userRole = Role.valueOf(role.toUpperCase());
@@ -44,8 +51,8 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/register-staff")
-    @PreAuthorize("hasAuthority('admin:create')")
+    @PostMapping("admin/register-staff")
+    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:create')")
     public ResponseEntity<Object> registerStaff(@RequestBody User user) {
         return ResponseEntity.ok(authenticationService.register(user));
     }

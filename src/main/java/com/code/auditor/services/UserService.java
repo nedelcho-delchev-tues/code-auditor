@@ -9,7 +9,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-    //TODO Rename UserService and change controller privileges
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {

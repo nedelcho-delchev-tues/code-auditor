@@ -3,17 +3,11 @@ package com.code.auditor.controllers;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.AuthenticationResponseDTO;
 import com.code.auditor.dtos.AuthenticationRequestDTO;
-import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
-import com.code.auditor.exceptions.InvalidEmailException;
-import com.code.auditor.exceptions.InvalidPasswordException;
 import com.code.auditor.services.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
