@@ -15,7 +15,7 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
     boolean existsByUserIdAndAssignmentId(Long userId, Long assignmentId);
 
     @Query(value = """
-            select new com.code.auditor.dtos.StudentSubmissionDTO(ss.id, ss.user.id, ss.assignment.id, ss.fileName)
+            select new com.code.auditor.dtos.StudentSubmissionDTO(ss.id, ss.user.id, ss.assignment.id, ss.fileName, ss.content)
             from StudentSubmission ss
             inner join User u
                 on ss.user.id = u.id

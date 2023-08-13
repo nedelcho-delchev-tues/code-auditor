@@ -51,6 +51,7 @@ public class User implements UserDetails {
      */
     @Column(nullable = false)
     @Size(min = 6, message = "Паролата трябва да е поне дълга поне 6 знака")
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -100,6 +101,7 @@ public class User implements UserDetails {
     private String stream;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<StudentSubmission> submissions;
 
     @OneToMany(mappedBy = "user")

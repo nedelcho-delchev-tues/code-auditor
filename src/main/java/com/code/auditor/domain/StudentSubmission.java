@@ -23,11 +23,11 @@ public class StudentSubmission {
     private String fileName;
 
     @Lob
-    @JsonIgnore
     private byte[] content;
 
     @ManyToOne
     @JoinColumn(name = "assignment_id")
+    @JsonIgnore
     private Assignment assignment;
 
     @ManyToOne

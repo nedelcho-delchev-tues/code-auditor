@@ -5,7 +5,6 @@ import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.repositories.StudentSubmissionRepository;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.compress.utils.CharsetNames;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -58,6 +57,7 @@ public class SubmissionSavedListener {
             String mavenProjectPom = mavenProjectDir + File.separator + "pom.xml";
 
             addSpotBugsPlugin(mavenProjectPom);
+
             executeExtractedProject(mavenProjectDir);
 
         } catch (Exception e) {

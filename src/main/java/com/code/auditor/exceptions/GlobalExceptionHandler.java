@@ -36,11 +36,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<MessageResponse> handleSubmissionSubmitted(NoSuchElementException e) {
-        MessageResponse errorResponse = new MessageResponse(HttpStatus.NOT_FOUND.value(), "Не е намерен такъв елемент.");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
+   @ExceptionHandler(NoSuchElementException.class)
+   public ResponseEntity<MessageResponse> handleSubmissionSubmitted(NoSuchElementException e) {
+       MessageResponse errorResponse = new MessageResponse(HttpStatus.NOT_FOUND.value(), "Не е намерен такъв елемент.");
+       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+   }
 
 
     // TODO Add other exception handlers for registration

@@ -48,7 +48,7 @@ public class AssignmentController {
     public ResponseEntity<Object> getStudentSubmission(@PathVariable Long assignmentId) {
         try {
             StudentSubmissionDTO studentSubmission = assignmentService.getStudentSubmissionByAssignment(assignmentId);
-            return ResponseEntity.ok(studentSubmission);
+            return ResponseEntity.ok().body(studentSubmission);
         } catch (NoSuchElementException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(

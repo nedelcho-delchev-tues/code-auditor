@@ -32,7 +32,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponseDTO> authenticate(@RequestBody AuthenticationRequestDTO request) {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticateUser(request));
     }
-
+    
     @PostMapping("/refresh_token")
     public void refreshToken(
             HttpServletRequest request,

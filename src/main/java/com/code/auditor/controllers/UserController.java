@@ -27,7 +27,7 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("user/")
+    @GetMapping("user")
     public ResponseEntity<Object> getUserInfoFromJwt(){
         return ResponseEntity.ok(jwtService.getUserByRequest());
     }

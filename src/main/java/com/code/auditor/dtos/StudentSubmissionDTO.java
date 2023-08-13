@@ -9,6 +9,7 @@ public class StudentSubmissionDTO {
     private Long userId;
     private Long assignmentId;
     private String fileName;
+    private byte[] content;
     private List<Feedback> feedbacks;
 
     public Long getId() {
@@ -39,6 +40,14 @@ public class StudentSubmissionDTO {
         this.assignmentId = assignmentId;
     }
 
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
     public List<Feedback> getFeedbacks() {
         return feedbacks;
     }
@@ -52,6 +61,14 @@ public class StudentSubmissionDTO {
         this.userId = userId;
         this.assignmentId = assignmentId;
         this.fileName = fileName;
+    }
+
+    public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName, byte[] content) {
+        this.id = id;
+        this.userId = userId;
+        this.assignmentId = assignmentId;
+        this.fileName = fileName;
+        this.content = content;
     }
 
     public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName, List<Feedback> feedbacks) {

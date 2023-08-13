@@ -1,7 +1,7 @@
 package com.code.auditor.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
@@ -31,37 +31,38 @@ public class Assignment {
 
     @Column(name = "CREATE_AT", nullable = false)
     @Expose
-    private Date createdTime;
+    private Date createdAt;
 
     @Column(name = "MODIFIED_AT", nullable = false)
     @Expose
-    private Date modifiedAT;
+    private Date modifiedAt;
 
     @OneToMany(mappedBy = "assignment")
+    @JsonIgnore
     private List<StudentSubmission> submissions;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"firstName", "lastName", "email", "password", "title", "role", "enabled", "accountNonExpired",
+    @JsonIgnoreProperties({"email", "password", "role", "enabled", "accountNonExpired",
             "accountNonLocked", "credentialsNonExpired", "authorities", "username", "assignments", "faculty", "facultyNumber",
             "specialization", "group", "stream", "submissions"})
-    @JsonProperty("user_id")
+    //@JsonProperty("user_id")
     private User user;
 
     @PrePersist
     protected void prePersist() {
-        if (this.createdTime == null) createdTime = new Date();
-        if (this.modifiedAT == null) modifiedAT = new Date();
+        if (this.createdAt == null) createdAt = new Date();
+        if (this.modifiedAt == null) modifiedAt = new Date();
     }
 
     @PreUpdate
     protected void preUpdate() {
-        this.modifiedAT = new Date();
+        this.modifiedAt = new Date();
     }
 
     @PreRemove
     protected void preRemove() {
-        this.modifiedAT = new Date();
+        this.modifiedAt = new Date();
     }
 
     public Assignment() {
@@ -103,20 +104,20 @@ public class Assignment {
         this.specialFiles = specialFiles;
     }
 
-    public Date getCreatedTime() {
-        return createdTime;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
+    public void setCreatedAt(Date createdTime) {
+        this.createdAt = createdTime;
     }
 
-    public Date getModifiedAT() {
-        return modifiedAT;
+    public Date getModifiedAt() {
+        return modifiedAt;
     }
 
-    public void setModifiedAT(Date modifiedAT) {
-        this.modifiedAT = modifiedAT;
+    public void setModifiedAt(Date modifiedAT) {
+        this.modifiedAt = modifiedAT;
     }
 
     public List<StudentSubmission> getSubmissions() {
