@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class AssignmentService {
@@ -62,14 +63,12 @@ public class AssignmentService {
         assignmentRepository.save(existingAssignment);
     }
 
-    public void uploadAssignment(Long assignmentId, MultipartFile content) throws IOException {
+    public void submitAssignment(Long assignmentId, MultipartFile content) throws IOException {
         User user = jwtService.getUserByRequest();
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow();
-
         if (hasSubmittedAssignment(user.getId(), assignmentId)) {
             throw new SubmissionSubmittedException("Вече сте предали решение за тази задача.");
         }
-
 
         StudentSubmission studentSubmission = new StudentSubmission();
 
@@ -83,9 +82,9 @@ public class AssignmentService {
     }
 
     @Transactional
-    public StudentSubmissionDTO getStudentSubmissionByAssignment(Long assignmentId){
+    public StudentSubmissionDTO getStudentSubmissionByAssignment(Long assignmentId) {
         User user = jwtService.getUserByRequest();
-        StudentSubmissionDTO studentSubmissionDTO = studentSubmissionRepository.getByUserIdAndAssignmentId(assignmentId, user.getId()).orElseThrow();
+        StudentSubmissionDTO studentSubmissionDTO = studentSubmissionRepository.getByUserIdAndAssignmentId(user.getId(), assignmentId).orElseThrow(NoSuchElementException::new);
         List<Feedback> feedbacks = feedbackRepository.findByStudentSubmissionId(studentSubmissionDTO.getId());
         studentSubmissionDTO.setFeedbacks(feedbacks);
         return studentSubmissionDTO;

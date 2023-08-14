@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.code.auditor.domain.StudentSubmission;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,7 +16,8 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
     boolean existsByUserIdAndAssignmentId(Long userId, Long assignmentId);
 
     @Query(value = """
-            select new com.code.auditor.dtos.StudentSubmissionDTO(ss.id, ss.user.id, ss.assignment.id, ss.fileName, ss.content)
+            select new com.code.auditor.dtos.StudentSubmissionDTO(
+            ss.id, ss.user.id, ss.assignment.id, ss.fileName, ss.content, ss.filesPresent, ss.buildPassing, ss.problems)
             from StudentSubmission ss
             inner join User u
                 on ss.user.id = u.id
@@ -29,4 +31,9 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
     @Modifying
     @Query("DELETE FROM StudentSubmission ss WHERE ss.user.id = :userId AND ss.assignment.id = :assignmentId")
     void deleteByUserIdAndAssignmentId(Long userId, Long assignmentId);
+
+    @Transactional
+    List<StudentSubmission> findAllByUserId(Long userId);
+
+    Optional<StudentSubmission> findById(Long Id);
 }

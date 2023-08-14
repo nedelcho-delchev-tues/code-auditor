@@ -14,12 +14,18 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.shared.invoker.*;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -31,6 +37,7 @@ public class SubmissionSavedListener {
 
     private static final Logger logger = LoggerFactory.getLogger(SubmissionSavedListener.class);
     private static final String mavenHome = System.getenv("MAVEN_HOME");
+    private static final String tempDir = System.getProperty("java.io.tmpdir");
     private final StudentSubmissionRepository studentSubmissionRepository;
 
     public SubmissionSavedListener(StudentSubmissionRepository studentSubmissionRepository) {
@@ -42,28 +49,79 @@ public class SubmissionSavedListener {
         try {
             StudentSubmission ss = studentSubmissionRepository.findById(submissionID).orElseThrow();
             if (!checkIfSpecialFilesPresent(ss)) {
-                // save into future AssignmentProblems table`
+                ss.setFilesPresent(false);
                 logger.error("files are not present");
+            }else{
+                ss.setFilesPresent(true);
             }
-
             logger.info("all files are present");
-
-            String tempDir = System.getProperty("java.io.tmpdir");
 
             //Project name might be different from zip name
             String projectName = unzipProjectAndGetParentDirName(ss.getContent(), tempDir);
 
             String mavenProjectDir = tempDir + FilenameUtils.removeExtension(projectName);
             String mavenProjectPom = mavenProjectDir + File.separator + "pom.xml";
+            String mavenProjectSpotBugs = mavenProjectDir + "target" + File.separator + "spotbugs.html";
 
             addSpotBugsPlugin(mavenProjectPom);
 
-            executeExtractedProject(mavenProjectDir);
+            InvocationResult result = executeExtractedProject(mavenProjectDir);
 
+            if (result.getExitCode() != 0) {
+                ss.setBuildPassing(false);
+                logger.error("Build has failed !" + result.getExecutionException());
+
+            }else {
+                ss.setBuildPassing(true);
+            }
+
+
+            byte[] spotBugsReport = getSpotBugsReport(mavenProjectSpotBugs);
+
+            ss.setProblems(spotBugsReport);
+
+            studentSubmissionRepository.save(ss);
         } catch (Exception e) {
             logger.error(String.valueOf(e));
             e.printStackTrace();
         }
+    }
+
+    private byte[] getSpotBugsReport(String mavenProjectSpotBugs) throws IOException {
+        Path path = Path.of(mavenProjectSpotBugs);
+
+        if (Files.exists(path)) {
+            return editSpotBugsReport(Files.readAllBytes(path));
+        } else {
+            throw new IOException("File not found: " + mavenProjectSpotBugs);
+        }
+    }
+
+    private byte[] editSpotBugsReport(byte[] htmlContent) {
+        String htmlContentString = new String(htmlContent, StandardCharsets.UTF_8);
+
+        Document document = Jsoup.parse(htmlContentString);
+
+        // Remove the "Code analyzed:" part
+        Element codeAnalyzed = document.selectFirst("p:containsOwn(Code analyzed:)");
+        if (codeAnalyzed != null) {
+            codeAnalyzed.remove();
+        }
+
+        // Remove the <ul> that follows
+        Element ulFollowingCodeAnalyzed = document.selectFirst("p:containsOwn(Code analyzed:) + ul");
+        if (ulFollowingCodeAnalyzed != null) {
+            ulFollowingCodeAnalyzed.remove();
+        }
+
+        Element liProjectPath = document.selectFirst("li:containsOwn(" + tempDir + ")");
+        if (liProjectPath != null) {
+            liProjectPath.remove();
+        }
+
+        String editedHtml = document.html();
+
+        return editedHtml.getBytes(StandardCharsets.UTF_8);
     }
 
     private boolean checkIfSpecialFilesPresent(StudentSubmission ss) {
@@ -125,7 +183,7 @@ public class SubmissionSavedListener {
         return parentDirName;
     }
 
-    private void executeExtractedProject(String workingDir) throws Exception {
+    private InvocationResult executeExtractedProject(String workingDir) throws Exception {
         try {
             Path mvn = Paths.get(mavenHome);
 
@@ -140,11 +198,7 @@ public class SubmissionSavedListener {
 
             InvocationResult result = invoker.execute(request);
 
-            if (result.getExitCode() != 0) {
-                // save into future AssignmentProblems table
-                logger.error("Build has failed !" + result.getExecutionException());
-
-            }
+            return result;
         } catch (Exception e) {
             System.err.println("Error executing Maven command: " + e.getMessage());
             throw new Exception("Build has failed !" + e.getMessage());
@@ -157,7 +211,7 @@ public class SubmissionSavedListener {
                     "<effort>default</effort> " +
                     "<reportLevel>high</reportLevel> " +
                     "<htmlOutput>true</htmlOutput> " +
-                    "<failOnError>false</failOnError>"+
+                    "<failOnError>false</failOnError>" +
                     "</configuration>";
             Model model = parsePomXmlFileToMavenPomModel(pomFilePath);
 

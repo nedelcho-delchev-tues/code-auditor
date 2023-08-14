@@ -3,6 +3,7 @@ package com.code.auditor.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.annotations.Expose;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -37,7 +38,7 @@ public class Assignment {
     @Expose
     private Date modifiedAt;
 
-    @OneToMany(mappedBy = "assignment")
+    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<StudentSubmission> submissions;
 

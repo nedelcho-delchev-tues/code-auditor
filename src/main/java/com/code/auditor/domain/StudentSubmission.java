@@ -25,6 +25,15 @@ public class StudentSubmission {
     @Lob
     private byte[] content;
 
+    @Column(name = "FILES_PRESENT")
+    boolean filesPresent;
+
+    @Column(name = "BUILD_PASSING")
+    boolean buildPassing;
+
+    @Lob
+    private byte[] problems;
+
     @ManyToOne
     @JoinColumn(name = "assignment_id")
     @JsonIgnore
@@ -60,6 +69,30 @@ public class StudentSubmission {
 
     public void setData(byte[] data) {
         this.content = data;
+    }
+
+    public boolean isFilesPresent() {
+        return filesPresent;
+    }
+
+    public void setFilesPresent(boolean filesPresent) {
+        this.filesPresent = filesPresent;
+    }
+
+    public boolean isBuildPassing() {
+        return buildPassing;
+    }
+
+    public void setBuildPassing(boolean buildPassing) {
+        this.buildPassing = buildPassing;
+    }
+
+    public byte[] getProblems() {
+        return problems;
+    }
+
+    public void setProblems(byte[] problems) {
+        this.problems = problems;
     }
 
     public Assignment getAssignment() {

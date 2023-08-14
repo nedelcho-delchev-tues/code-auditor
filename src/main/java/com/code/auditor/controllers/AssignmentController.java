@@ -63,7 +63,7 @@ public class AssignmentController {
     @PostMapping("{assignmentId}/submit-assignment")
     public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
                                                    @RequestPart("file") MultipartFile content) throws IOException {
-            assignmentService.uploadAssignment(assignmentId, content);
+            assignmentService.submitAssignment(assignmentId, content);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
 

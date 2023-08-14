@@ -10,10 +10,17 @@ public class StudentSubmissionDTO {
     private Long assignmentId;
     private String fileName;
     private byte[] content;
+    private boolean filesPresent;
+    private boolean buildPassing;
+    private byte[] problems;
     private List<Feedback> feedbacks;
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFileName() {
@@ -48,6 +55,30 @@ public class StudentSubmissionDTO {
         this.content = content;
     }
 
+    public boolean isBuildPassing() {
+        return buildPassing;
+    }
+
+    public void setBuildPassing(boolean buildPassing) {
+        this.buildPassing = buildPassing;
+    }
+
+    public boolean isFilesPresent() {
+        return filesPresent;
+    }
+
+    public void setFilesPresent(boolean filesPresent) {
+        this.filesPresent = filesPresent;
+    }
+
+    public byte[] getProblems() {
+        return problems;
+    }
+
+    public void setProblems(byte[] problems) {
+        this.problems = problems;
+    }
+
     public List<Feedback> getFeedbacks() {
         return feedbacks;
     }
@@ -56,26 +87,17 @@ public class StudentSubmissionDTO {
         this.feedbacks = feedbacks;
     }
 
-    public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName) {
-        this.id = id;
-        this.userId = userId;
-        this.assignmentId = assignmentId;
-        this.fileName = fileName;
+    public StudentSubmissionDTO() {
     }
 
-    public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName, byte[] content) {
+    public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName, byte[] content, boolean filesPresent, boolean buildPassing, byte[] problems) {
         this.id = id;
         this.userId = userId;
         this.assignmentId = assignmentId;
         this.fileName = fileName;
         this.content = content;
-    }
-
-    public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName, List<Feedback> feedbacks) {
-        this.id = id;
-        this.userId = userId;
-        this.assignmentId = assignmentId;
-        this.fileName = fileName;
-        this.feedbacks = feedbacks;
+        this.buildPassing = buildPassing;
+        this.filesPresent = filesPresent;
+        this.problems = problems;
     }
 }
