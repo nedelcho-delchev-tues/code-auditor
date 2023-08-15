@@ -107,7 +107,7 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Assignment> assignments;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Token> tokens;
 

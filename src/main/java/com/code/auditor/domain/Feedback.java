@@ -25,7 +25,7 @@ public class Feedback {
 
     @Column(name = "CREATE_AT", nullable = false)
     @Expose
-    private Date createdTime;
+    private Date createAt;
 
     public Long getId() {
         return id;
@@ -55,16 +55,16 @@ public class Feedback {
         this.commenter = commenter;
     }
 
-    public Date getCreatedTime() {
-        return createdTime;
+    public Date getCreateAt() {
+        return createAt;
     }
 
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
+    public void setCreateAt(Date createdTime) {
+        this.createAt = createdTime;
     }
 
     @PrePersist
     protected void prePersist() {
-        if (this.createdTime == null) createdTime = new Date();
+        if (this.createAt == null) createAt = new Date();
     }
 }

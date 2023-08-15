@@ -1,6 +1,7 @@
 package com.code.auditor.configuration;
 
 import com.code.auditor.repositories.TokenRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,6 +60,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            }else{
+                if (!jwtService.isTokenValid(jwt, userDetails) || !isTokenValid) {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.getWriter().write("Token is invalid or expired");
+                    return;
+                }
             }
         }
         filterChain.doFilter(request, response);

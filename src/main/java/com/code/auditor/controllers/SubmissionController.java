@@ -1,7 +1,9 @@
 package com.code.auditor.controllers;
 
+import com.code.auditor.domain.Feedback;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.dtos.StudentSubmissionDTO;
+import com.code.auditor.repositories.FeedbackRepository;
 import com.code.auditor.services.StudentSubmissionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,11 @@ import java.util.List;
 @RequestMapping("/api/v1/submission")
 public class SubmissionController {
     private final StudentSubmissionService studentSubmissionService;
+    private final FeedbackRepository feedbackRepository;
 
-    public SubmissionController(StudentSubmissionService studentSubmissionService) {
+    public SubmissionController(StudentSubmissionService studentSubmissionService, FeedbackRepository feedbackRepository) {
         this.studentSubmissionService = studentSubmissionService;
+        this.feedbackRepository = feedbackRepository;
     }
 
     @GetMapping()
@@ -28,6 +32,12 @@ public class SubmissionController {
     public ResponseEntity<Object> getSubmissionById(@PathVariable Long submissionId){
         StudentSubmissionDTO studentSubmission = studentSubmissionService.findById(submissionId);
         return ResponseEntity.ok(studentSubmission);
+    }
+
+    @GetMapping("/{submissionId}/feedbacks")
+    public ResponseEntity<Object> getFeedbacksBySubmissions(@PathVariable Long submissionId){
+        List<Feedback> feedbacks = feedbackRepository.findByStudentSubmissionId(submissionId);
+        return ResponseEntity.ok(feedbacks);
     }
 
     @DeleteMapping("/{submissionId}")
