@@ -9,16 +9,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public List<User> getUserByRole(Role role) {
-        return userRepository.findByRole(role);
-    }
-
     public static String buildNameAndTitle(String... strings) {
         StringBuilder result = new StringBuilder();
         boolean isFirstNonNull = true;

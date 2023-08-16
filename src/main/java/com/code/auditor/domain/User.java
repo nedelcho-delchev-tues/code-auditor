@@ -99,6 +99,10 @@ public class User implements UserDetails {
     @Expose
     private String stream;
 
+    @Column(name = "ENABLED")
+    @Expose
+    private Boolean enabled = true;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<StudentSubmission> submissions;
@@ -235,6 +239,14 @@ public class User implements UserDetails {
         this.tokens = tokens;
     }
 
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
@@ -267,6 +279,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 }
