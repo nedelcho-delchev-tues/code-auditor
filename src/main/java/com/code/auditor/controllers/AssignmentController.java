@@ -71,7 +71,7 @@ public class AssignmentController {
 
     @DeleteMapping("{assignmentId}/delete_submission")
     public ResponseEntity<Object> deleteStudentSubmission(@PathVariable Long assignmentId) {
-        assignmentService.deleteSubmissionByStudent(assignmentId);
+        assignmentService.deleteSubmissionByUserAndAssignment(assignmentId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше изтрита успешно."));
     }
@@ -80,6 +80,11 @@ public class AssignmentController {
     public ResponseEntity<List<Assignment>> findAllByStaff(@PathVariable Long staffId) {
         List<Assignment> assignments = assignmentRepository.findAllByUserId(staffId);
         return ResponseEntity.ok(assignments);
+    }
+
+    @GetMapping("/count_assignments")
+    public ResponseEntity<Object> countAllAssignments(){
+        return ResponseEntity.ok(assignmentRepository.count());
     }
 
     @PostMapping()

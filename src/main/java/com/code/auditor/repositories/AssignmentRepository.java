@@ -12,5 +12,4 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     @Query("SELECT a FROM Assignment a WHERE a.user.id = :userId")
     List<Assignment> findAllByUserId(Long userId);
-
 }

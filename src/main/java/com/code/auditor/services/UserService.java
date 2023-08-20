@@ -3,6 +3,7 @@ package com.code.auditor.services;
 import com.code.auditor.domain.User;
 import com.code.auditor.dtos.ChangePasswordDTO;
 import com.code.auditor.exceptions.InvalidPasswordException;
+import com.code.auditor.repositories.StudentSubmissionRepository;
 import com.code.auditor.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,12 @@ import static com.code.auditor.services.AuthenticationService.MIN_CHAR_FOR_PASSW
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final StudentSubmissionRepository studentSubmissionRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, StudentSubmissionRepository studentSubmissionRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.studentSubmissionRepository = studentSubmissionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -45,6 +48,10 @@ public class UserService {
         } else {
             throw new IllegalArgumentException("Потребител с това id не е намерен: " + id);
         }
+    }
+
+    public int countSubmissions(Long id){
+        return studentSubmissionRepository.countStudentSubmissionByUserId(id);
     }
 
     public static String buildNameAndTitle(String... strings) {

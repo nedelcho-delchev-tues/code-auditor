@@ -1,6 +1,7 @@
 package com.code.auditor.controllers;
 
 import com.code.auditor.configuration.JwtService;
+import com.code.auditor.domain.User;
 import com.code.auditor.dtos.ChangePasswordDTO;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.services.UserService;
@@ -24,6 +25,12 @@ public class UserController {
     @GetMapping()
     public ResponseEntity<Object> getUserInfoFromJwt(){
         return ResponseEntity.ok(jwtService.getUserByRequest());
+    }
+
+    @GetMapping("/count_submissions")
+    public ResponseEntity<Object> countSubmissions(){
+        User user = jwtService.getUserByRequest();
+        return ResponseEntity.ok(userService.countSubmissions(user.getId()));
     }
 
     @PostMapping("/{id}/change_password")

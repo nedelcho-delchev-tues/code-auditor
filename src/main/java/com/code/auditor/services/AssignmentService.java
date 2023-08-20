@@ -89,9 +89,9 @@ public class AssignmentService {
         return studentSubmissionDTO;
     }
 
-    public void deleteSubmissionByStudent(Long assignmentId){
+    public void deleteSubmissionByUserAndAssignment(Long assignmentId){
         User user = jwtService.getUserByRequest();
-        studentSubmissionRepository.deleteByUserIdAndAssignmentId(assignmentId, user.getId());
+        studentSubmissionRepository.deleteByUserIdAndAssignmentId(user.getId(), assignmentId);
     }
 
     private boolean hasSubmittedAssignment(Long userId, Long assignmentId) {

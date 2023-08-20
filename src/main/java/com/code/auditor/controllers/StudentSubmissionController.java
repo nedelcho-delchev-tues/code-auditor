@@ -13,11 +13,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/submission")
-public class SubmissionController {
+public class StudentSubmissionController {
     private final StudentSubmissionService studentSubmissionService;
     private final FeedbackRepository feedbackRepository;
 
-    public SubmissionController(StudentSubmissionService studentSubmissionService, FeedbackRepository feedbackRepository) {
+    public StudentSubmissionController(StudentSubmissionService studentSubmissionService, FeedbackRepository feedbackRepository) {
         this.studentSubmissionService = studentSubmissionService;
         this.feedbackRepository = feedbackRepository;
     }
