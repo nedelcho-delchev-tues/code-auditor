@@ -36,4 +36,6 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
     List<StudentSubmission> findAllByUserId(Long userId);
 
     Optional<StudentSubmission> findById(Long Id);
+
+    int countStudentSubmissionByUserId(Long userId);
 }

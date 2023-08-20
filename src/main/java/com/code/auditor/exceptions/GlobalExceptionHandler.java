@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<MessageResponse> handleInvalidEmailException(InvalidPasswordException e) {
-        MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), "Невалидна парола. Паролата трябва да е поне дълга поне 6 знака");
+        MessageResponse errorResponse = new MessageResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 

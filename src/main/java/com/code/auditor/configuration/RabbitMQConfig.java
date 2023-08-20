@@ -9,8 +9,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-    public static final String EXCHANGE_NAME = "student_submission_exchange";
-    public static final String QUEUE_NAME = "student_submission_queue";
+    private static final String CODE_AUDITOR_EXCHANGE = "code_auditor_exchange";
+
+    private static final String SUBMISSION_QUEUE = "student_submission_queue";
+    private static final String SUBMISSION_SAVED_KEY = "submission.saved";
 
     @Value("${spring.rabbitmq.host}")
     private String rabbitMqHost;
@@ -37,25 +39,21 @@ public class RabbitMQConfig {
 
     @Bean
     public RabbitTemplate rabbitTemplate(CachingConnectionFactory connectionFactory) {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setExchange(EXCHANGE_NAME);
-        rabbitTemplate.setDefaultReceiveQueue(QUEUE_NAME);
-
-        return rabbitTemplate;
+        return new RabbitTemplate(connectionFactory);
     }
 
     @Bean
-    public Exchange studentSubmissionExchange() {
-        return new TopicExchange(EXCHANGE_NAME);
+    public DirectExchange codeAuditorExchange() {
+        return new DirectExchange(CODE_AUDITOR_EXCHANGE);
     }
 
     @Bean
     public Queue studentSubmissionQueue() {
-        return new Queue(QUEUE_NAME);
+        return new Queue(SUBMISSION_QUEUE);
     }
 
     @Bean
-    public Binding binding(Exchange recordInsertedExchange, Queue recordInsertedQueue) {
-        return BindingBuilder.bind(recordInsertedQueue).to(recordInsertedExchange).with("submission.saved").noargs();
+    public Binding submissionBinding(Queue studentSubmissionQueue, DirectExchange exchange) {
+        return BindingBuilder.bind(studentSubmissionQueue).to(exchange).with(SUBMISSION_SAVED_KEY);
     }
 }

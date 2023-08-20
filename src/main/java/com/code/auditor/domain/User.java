@@ -7,8 +7,8 @@ import com.google.gson.annotations.Expose;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class User implements UserDetails {
      * The password of the user.
      */
     @Column(nullable = false)
-    @Size(min = 6, message = "Паролата трябва да е поне дълга поне 6 знака")
+    @Size(min = 6, message = "Паролата трябва дa e дълга поне 6 знака")
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -125,6 +125,10 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getId() {

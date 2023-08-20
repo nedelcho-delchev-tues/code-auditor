@@ -1,6 +1,7 @@
 package com.code.auditor.controllers;
 
 import com.code.auditor.domain.User;
+import com.code.auditor.dtos.AdminUserUpdateDTO;
 import com.code.auditor.dtos.MessageResponse;
 import com.code.auditor.enums.Role;
 import com.code.auditor.services.AdminService;
@@ -36,6 +37,14 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getUserById(id));
     }
 
+    @PutMapping("/update-user/{id}")
+    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
+    public ResponseEntity<Object> updateUserById(@PathVariable Long id, @RequestBody AdminUserUpdateDTO adminUserUpdateDTO) {
+        adminService.updateUserById(id, adminUserUpdateDTO);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Потребителят беше обновено успешно."));
+    }
+
     @GetMapping("/user-by-role/{role}")
     @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
     public ResponseEntity<Object> getAllUserByRole(@PathVariable String role) {
@@ -58,10 +67,20 @@ public class AdminController {
     @PostMapping("/register-user")
     @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:create')")
     public ResponseEntity<Object> registerStaff(@RequestBody User user) {
-        return ResponseEntity.ok(authenticationService.register(user));
+        authenticationService.register(user);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Потребителят беше създаден успешно!"));
     }
 
-    @PostMapping("/{id}/disable")
+    @PostMapping("/enable-user/{id}")
+    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:create')")
+    public ResponseEntity<Object> enableUser(@PathVariable Long id){
+        adminService.enableUser(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Потребителят беше възобновен успешно."));
+    }
+
+    @PostMapping("/disable-user/{id}")
     @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:create')")
     public ResponseEntity<Object> disableUser(@PathVariable Long id){
         adminService.disableUser(id);

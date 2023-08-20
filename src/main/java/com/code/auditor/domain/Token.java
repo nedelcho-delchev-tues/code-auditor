@@ -2,7 +2,7 @@ package com.code.auditor.domain;
 
 import com.code.auditor.enums.TokenType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class Token {

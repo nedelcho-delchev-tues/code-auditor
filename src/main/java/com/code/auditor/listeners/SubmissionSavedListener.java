@@ -1,6 +1,5 @@
 package com.code.auditor.listeners;
 
-import com.code.auditor.configuration.RabbitMQConfig;
 import com.code.auditor.domain.StudentSubmission;
 import com.code.auditor.repositories.StudentSubmissionRepository;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -17,7 +16,6 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -44,7 +42,7 @@ public class SubmissionSavedListener {
         this.studentSubmissionRepository = studentSubmissionRepository;
     }
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    @RabbitListener(queues = "student_submission_queue")
     public void handleRecordInsertedEvent(Long submissionID) {
         try {
             StudentSubmission ss = studentSubmissionRepository.findById(submissionID).orElseThrow();

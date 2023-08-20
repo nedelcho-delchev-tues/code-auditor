@@ -18,14 +18,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Service
 public class AuthenticationService {
 
-    private static final int MIN_CHAR_FOR_PASSWORD = 6;
+    public static final int MIN_CHAR_FOR_PASSWORD = 6;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
