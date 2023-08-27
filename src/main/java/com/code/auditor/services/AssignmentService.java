@@ -89,6 +89,10 @@ public class AssignmentService {
         return studentSubmissionDTO;
     }
 
+    public List<Assignment> searchAssignments(String keyword) {
+        return assignmentRepository.findByTitleOrUserFirstNameOrUserLastName(keyword);
+    }
+
     public void deleteSubmissionByUserAndAssignment(Long assignmentId){
         User user = jwtService.getUserByRequest();
         studentSubmissionRepository.deleteByUserIdAndAssignmentId(user.getId(), assignmentId);

@@ -60,6 +60,12 @@ public class AssignmentController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Assignment>> searchAssignments(@RequestParam String keyword) {
+        List<Assignment> assignments = assignmentService.searchAssignments(keyword);
+        return ResponseEntity.ok(assignments);
+    }
+
     @PostMapping("{assignmentId}/submit-assignment")
     public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
                                                    @RequestPart("file") MultipartFile content) throws IOException {
