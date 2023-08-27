@@ -54,8 +54,8 @@ public class StudentSubmissionService {
     private StudentSubmissionDTO mapSubmissionToDTO(StudentSubmission submission) {
         StudentSubmissionDTO dto = new StudentSubmissionDTO();
         dto.setId(submission.getId());
-        dto.setUserId(submission.getUser().getId());
-        dto.setAssignmentId(submission.getAssignment().getId());
+        dto.setUser(submission.getUser());
+        dto.setAssignment(submission.getAssignment());
         dto.setFileName(submission.getFileName());
         dto.setContent(submission.getContent());
         dto.setFilesPresent(submission.isFilesPresent());

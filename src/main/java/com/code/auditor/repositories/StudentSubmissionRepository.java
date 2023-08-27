@@ -17,7 +17,7 @@ public interface StudentSubmissionRepository extends JpaRepository<StudentSubmis
 
     @Query(value = """
             select new com.code.auditor.dtos.StudentSubmissionDTO(
-            ss.id, ss.user.id, ss.assignment.id, ss.fileName, ss.content, ss.filesPresent, ss.buildPassing, ss.problems)
+            ss.id, ss.user, ss.assignment, ss.fileName, ss.content, ss.filesPresent, ss.buildPassing, ss.problems)
             from StudentSubmission ss
             inner join User u
                 on ss.user.id = u.id

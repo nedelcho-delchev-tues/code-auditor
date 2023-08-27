@@ -1,13 +1,15 @@
 package com.code.auditor.dtos;
 
+import com.code.auditor.domain.Assignment;
 import com.code.auditor.domain.Feedback;
+import com.code.auditor.domain.User;
 
 import java.util.List;
 
 public class StudentSubmissionDTO {
     private Long id;
-    private Long userId;
-    private Long assignmentId;
+    private User user;
+    private Assignment assignment;
     private String fileName;
     private byte[] content;
     private boolean filesPresent;
@@ -31,20 +33,20 @@ public class StudentSubmissionDTO {
         this.fileName = fileName;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Long getAssignmentId() {
-        return assignmentId;
+    public Assignment getAssignment() {
+        return assignment;
     }
 
-    public void setAssignmentId(Long assignmentId) {
-        this.assignmentId = assignmentId;
+    public void setAssignment(Assignment assignment) {
+        this.assignment = assignment;
     }
 
     public byte[] getContent() {
@@ -90,14 +92,14 @@ public class StudentSubmissionDTO {
     public StudentSubmissionDTO() {
     }
 
-    public StudentSubmissionDTO(Long id, Long userId, Long assignmentId, String fileName, byte[] content, boolean filesPresent, boolean buildPassing, byte[] problems) {
+    public StudentSubmissionDTO(Long id, User user, Assignment assignment, String fileName, byte[] content, boolean filesPresent, boolean buildPassing, byte[] problems) {
         this.id = id;
-        this.userId = userId;
-        this.assignmentId = assignmentId;
+        this.user = user;
+        this.assignment = assignment;
         this.fileName = fileName;
         this.content = content;
-        this.buildPassing = buildPassing;
         this.filesPresent = filesPresent;
+        this.buildPassing = buildPassing;
         this.problems = problems;
     }
 }
