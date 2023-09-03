@@ -66,31 +66,24 @@ public class AssignmentController {
         return ResponseEntity.ok(assignments);
     }
 
+//    @GetMapping("/find-by-staff/{staffId}")
+//    public ResponseEntity<List<Assignment>> findAllByStaff(@PathVariable Long staffId) {
+//        List<Assignment> assignments = assignmentRepository.findAllByUserId(staffId);
+//        return ResponseEntity.ok(assignments);
+//    }
+
+    @GetMapping("/count-assignments")
+    public ResponseEntity<Object> countAllAssignments() {
+        return ResponseEntity.ok(assignmentRepository.count());
+    }
+
     @PostMapping("{assignmentId}/submit-assignment")
     public ResponseEntity<Object> submitAssignment(@PathVariable Long assignmentId,
                                                    @RequestPart("file") MultipartFile content) throws IOException {
-            assignmentService.submitAssignment(assignmentId, content);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
-
-    }
-
-    @DeleteMapping("{assignmentId}/delete_submission")
-    public ResponseEntity<Object> deleteStudentSubmission(@PathVariable Long assignmentId) {
-        assignmentService.deleteSubmissionByUserAndAssignment(assignmentId);
+        assignmentService.submitAssignment(assignmentId, content);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше изтрита успешно."));
-    }
+                .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше предадена успешно!"));
 
-    @GetMapping("/find-by-staff/{staffId}")
-    public ResponseEntity<List<Assignment>> findAllByStaff(@PathVariable Long staffId) {
-        List<Assignment> assignments = assignmentRepository.findAllByUserId(staffId);
-        return ResponseEntity.ok(assignments);
-    }
-
-    @GetMapping("/count_assignments")
-    public ResponseEntity<Object> countAllAssignments(){
-        return ResponseEntity.ok(assignmentRepository.count());
     }
 
     @PostMapping()
@@ -107,6 +100,13 @@ public class AssignmentController {
         assignmentService.updateAssignment(assignmentId, assignmentRequest);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new MessageResponse(HttpStatus.OK.value(), "Заданието беше обновено успешно."));
+    }
+
+    @DeleteMapping("{assignmentId}/delete-submission")
+    public ResponseEntity<Object> deleteStudentSubmission(@PathVariable Long assignmentId) {
+        assignmentService.deleteSubmissionByUserAndAssignment(assignmentId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Задачата беше изтрита успешно."));
     }
 
     @DeleteMapping("{assignmentId}")

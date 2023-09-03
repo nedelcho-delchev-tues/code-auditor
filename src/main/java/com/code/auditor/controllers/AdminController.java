@@ -25,7 +25,7 @@ public class AdminController {
         this.authenticationService = authenticationService;
     }
 
-    @GetMapping("/all_users")
+    @GetMapping("/all-users")
     @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
     public ResponseEntity<Object> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
@@ -35,14 +35,6 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
     public ResponseEntity<Object> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.getUserById(id));
-    }
-
-    @PutMapping("/update-user/{id}")
-    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
-    public ResponseEntity<Object> updateUserById(@PathVariable Long id, @RequestBody AdminUserUpdateDTO adminUserUpdateDTO) {
-        adminService.updateUserById(id, adminUserUpdateDTO);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new MessageResponse(HttpStatus.OK.value(), "Потребителят беше обновено успешно."));
     }
 
     @GetMapping("/user-by-role/{role}")
@@ -62,6 +54,14 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                     new MessageResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Неочаквана грешка:" + e.getMessage()));
         }
+    }
+
+    @PutMapping("/update-user/{id}")
+    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
+    public ResponseEntity<Object> updateUserById(@PathVariable Long id, @RequestBody AdminUserUpdateDTO adminUserUpdateDTO) {
+        adminService.updateUserById(id, adminUserUpdateDTO);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MessageResponse(HttpStatus.OK.value(), "Потребителят беше обновено успешно."));
     }
 
     @PostMapping("/register-user")

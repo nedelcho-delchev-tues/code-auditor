@@ -32,7 +32,7 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticateUser(request));
     }
 
-    @PostMapping("/refresh_token")
+    @PostMapping("/refresh-token")
     public void refreshToken(
             HttpServletRequest request,
             HttpServletResponse response

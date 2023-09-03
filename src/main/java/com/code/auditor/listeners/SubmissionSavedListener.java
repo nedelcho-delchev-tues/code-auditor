@@ -110,6 +110,8 @@ public class SubmissionSavedListener {
 
             if (spotBugsReport.length > 0) {
                 ss.setProblems(spotBugsReport);
+            } else {
+                ss.setProblems(HTMLTemplates.SPOTBUGS_NOT_FOUND.getBytes());
             }
 
             studentSubmissionRepository.save(ss);

@@ -19,7 +19,7 @@ public class StudentSubmission {
     @Column(name = "ID", nullable = false)
     private Long id;
 
-    @Column(name = "FILE_NAME")
+    @Column(name = "FILE_NAME", nullable = false)
     private String fileName;
 
     @Lob

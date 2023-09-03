@@ -27,16 +27,21 @@ public class UserController {
         return ResponseEntity.ok(jwtService.getUserByRequest());
     }
 
-    @GetMapping("/count_submissions")
+    @GetMapping("/count-submissions")
     public ResponseEntity<Object> countSubmissions(){
         User user = jwtService.getUserByRequest();
         return ResponseEntity.ok(userService.countSubmissions(user.getId()));
     }
 
-    @PostMapping("/{id}/change_password")
+    @PostMapping("/{id}/change-password")
     public ResponseEntity<Object> changePassword(@PathVariable Long id, @RequestBody ChangePasswordDTO changePasswordDTO){
-        userService.changePassword(id, changePasswordDTO);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new MessageResponse(HttpStatus.OK.value(), "Паролата беше обновенна успешно."));
+        try {
+            userService.changePassword(id, changePasswordDTO);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new MessageResponse(HttpStatus.OK.value(), "Паролата беше обновенна успешно."));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new MessageResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        }
     }
 }
