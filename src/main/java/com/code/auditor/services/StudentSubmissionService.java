@@ -27,7 +27,7 @@ public class StudentSubmissionService {
         User user = jwtService.getUserByRequest();
         List<StudentSubmission> submissions;
 
-        if (user.getRole() == Role.ADMIN) {
+        if (user.getRole() == Role.ADMIN || user.getRole() == Role.PROFESSOR) {
             submissions = studentSubmissionRepository.findAll();
         } else {
             submissions = studentSubmissionRepository.findAllByUserId(user.getId());

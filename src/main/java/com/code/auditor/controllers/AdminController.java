@@ -26,13 +26,13 @@ public class AdminController {
     }
 
     @GetMapping("/all-users")
-    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
+    @PreAuthorize("(hasRole('ADMIN') && hasAuthority('admin:read')) || (hasRole('PROFESSOR') && hasAuthority('professor:read'))")
     public ResponseEntity<Object> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
     }
 
     @GetMapping("/user/{id}")
-    @PreAuthorize("hasRole('ADMIN') && hasAuthority('admin:read')")
+    @PreAuthorize("(hasRole('ADMIN') && hasAuthority('admin:read')) || (hasRole('PROFESSOR') && hasAuthority('professor:read'))")
     public ResponseEntity<Object> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.getUserById(id));
     }

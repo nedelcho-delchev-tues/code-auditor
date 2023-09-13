@@ -59,10 +59,10 @@ public class SecurityConfig {
                 )
                 .permitAll()
 
-                .requestMatchers("/api/v1/admin/**").hasAnyRole(ADMIN.name())
+                .requestMatchers("/api/v1/admin/**").hasAnyRole(ADMIN.name(), PROFESSOR.name())
 
                 .requestMatchers(POST, "/api/v1/admin/**").hasAnyAuthority(ADMIN_CREATE.name())
-                .requestMatchers(GET, "/api/v1/admin/**").hasAnyAuthority(ADMIN_READ.name())
+                .requestMatchers(GET, "/api/v1/admin/**").hasAnyAuthority(ADMIN_READ.name(), PROFESSOR_READ.name())
                 .requestMatchers(PUT, "/api/v1/admin/**").hasAnyAuthority(ADMIN_UPDATE.name())
                 .requestMatchers(DELETE, "/api/v1/admin/**").hasAnyAuthority(ADMIN_DELETE.name())
 
