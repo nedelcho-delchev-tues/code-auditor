@@ -57,7 +57,7 @@ public class HTMLTemplates {
 
             <div class="errorMessage">
                 Report creation has failed! </br>
-                Please check that the submission is in the following format: </br>
+                Please check that the submission is building correctly with: </br>
                 Technology: Java </br>
                 Build Tool: Apache Maven </br>
             </div>
@@ -67,6 +67,10 @@ public class HTMLTemplates {
             """;
 
     public static String convertToHtml(String text) {
+        if (text == null) {
+            return "";
+        }
+
         StringBuilder html = new StringBuilder("<html><body><pre>");
 
         String escapedText = text

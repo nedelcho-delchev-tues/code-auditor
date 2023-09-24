@@ -44,8 +44,8 @@ public class SubmissionSavedListener {
     private static final String tempDir = System.getProperty("java.io.tmpdir");
     private String databaseName;
     private String mavenOutput;
-    private final StudentSubmissionRepository studentSubmissionRepository;
     private final DatabaseCreationService databaseCreationService;
+    private final StudentSubmissionRepository studentSubmissionRepository;
 
     public SubmissionSavedListener(StudentSubmissionRepository studentSubmissionRepository, DatabaseCreationService databaseCreationService) {
         this.studentSubmissionRepository = studentSubmissionRepository;
@@ -81,7 +81,7 @@ public class SubmissionSavedListener {
             logger.info("all files are present");
 
             //Project name might be different from zip name
-            String projectName = unzipProjectAndGetParentDirName(ss.getContent());
+            String projectName = unzipProjectAndGetParentDirName(ss.getContent(), tempDir);
 
             String mavenProjectDir = tempDir + FilenameUtils.removeExtension(projectName);
             String mavenProjectPom = mavenProjectDir + File.separator + "pom.xml";
@@ -106,11 +106,10 @@ public class SubmissionSavedListener {
                 ss.setBuildPassing(true);
             }
 
-            byte[] spotBugsReport = getSpotBugsReport(mavenProjectSpotBugs);
-
-            if (spotBugsReport.length > 0) {
+            try {
+                byte[] spotBugsReport = getSpotBugsReport(mavenProjectSpotBugs);
                 ss.setProblems(spotBugsReport);
-            } else {
+            } catch (IOException e) {
                 ss.setProblems(HTMLTemplates.SPOTBUGS_NOT_FOUND.getBytes());
             }
 
@@ -124,13 +123,11 @@ public class SubmissionSavedListener {
     private byte[] getSpotBugsReport(String mavenProjectSpotBugs) throws IOException {
         Path path = Path.of(mavenProjectSpotBugs);
 
-        try {
-            Files.exists(path);
+        if (Files.exists(path)) {
             return editSpotBugsReport(Files.readAllBytes(path));
-        } catch (IOException e) {
-            logger.error("File not found: " + mavenProjectSpotBugs);
+        } else {
+            throw new IOException("File not found: " + mavenProjectSpotBugs);
         }
-        return new byte[0];
     }
 
     private byte[] editSpotBugsReport(byte[] htmlContent) {
@@ -189,7 +186,12 @@ public class SubmissionSavedListener {
         return foundFiles.containsAll(specialFiles);
     }
 
-    private String unzipProjectAndGetParentDirName(byte[] submissionContent) {
+    private String getFileNameFromEntry(ZipEntry entry) {
+        String fullPath = entry.getName();
+        return fullPath.substring(fullPath.lastIndexOf('/') + 1);
+    }
+
+    private String unzipProjectAndGetParentDirName(byte[] submissionContent, String destinationDir) {
         String parentDirName = null;
         byte[] buffer = new byte[1024];
         ZipArchiveInputStream zipInputStream = new ZipArchiveInputStream(
@@ -198,8 +200,9 @@ public class SubmissionSavedListener {
         try (zipInputStream) {
             ZipArchiveEntry entry = zipInputStream.getNextZipEntry();
             while (entry != null) {
-                String filePath = tempDir + File.separator + entry.getName();
+                String filePath = destinationDir + File.separator + entry.getName();
                 if (!entry.isDirectory()) {
+                    new File(filePath).getParentFile().mkdirs();
                     try (FileOutputStream fos = new FileOutputStream(filePath)) {
                         int length;
                         while ((length = zipInputStream.read(buffer)) > 0) {
@@ -218,9 +221,75 @@ public class SubmissionSavedListener {
         return parentDirName;
     }
 
-    private String getFileNameFromEntry(ZipEntry entry) {
-        String fullPath = entry.getName();
-        return fullPath.substring(fullPath.lastIndexOf('/') + 1);
+    private InvocationResult executeExtractedProject(String workingDir) throws Exception {
+        try {
+            Path mvn = Paths.get(mavenHome);
+
+            InvocationRequest request = new DefaultInvocationRequest();
+
+            request.setInputStream(InputStream.nullInputStream());
+            request.setGoals(Arrays.asList("clean", "install"));
+            request.setBaseDirectory(new File(workingDir));
+            request.setMavenHome(mvn.toFile());
+
+            DefaultInvoker invoker = new DefaultInvoker();
+
+            InvocationResult result = invoker.execute(request);
+
+            return result;
+        } catch (Exception e) {
+            throw new Exception("Error executing Maven command: " + e.getMessage());
+        }
+    }
+
+    private void addSpotBugsPlugin(String pomFilePath) {
+        try {
+            String configuration = "<configuration> " +
+                    "<effort>default</effort> " +
+                    "<reportLevel>high</reportLevel> " +
+                    "<htmlOutput>true</htmlOutput> " +
+                    "<failOnError>false</failOnError>" +
+                    "</configuration>";
+            Model model = parsePomXmlFileToMavenPomModel(pomFilePath);
+
+            Xpp3Dom pluginConfiguration = Xpp3DomBuilder.build(new StringReader(configuration));
+
+            List<PluginExecution> pluginExecutions = new ArrayList<>();
+            PluginExecution pluginExecution = new PluginExecution();
+            pluginExecution.addGoal("check");
+            pluginExecution.setPhase("install");
+            pluginExecutions.add(pluginExecution);
+
+            Plugin spotBugs = new Plugin();
+            spotBugs.setGroupId("com.github.spotbugs");
+            spotBugs.setArtifactId("spotbugs-maven-plugin");
+            spotBugs.setVersion("4.7.3.5");
+            spotBugs.setConfiguration(pluginConfiguration);
+            spotBugs.setExecutions(pluginExecutions);
+
+            model.getBuild().addPlugin(spotBugs);
+
+            parseMavenPomModelToXmlString(pomFilePath, model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Model parsePomXmlFileToMavenPomModel(String path) throws Exception {
+        Model model;
+        FileReader reader;
+
+        MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+        reader = new FileReader(path);
+        model = mavenReader.read(reader);
+
+        return model;
+    }
+
+    private void parseMavenPomModelToXmlString(String path, Model model) throws Exception {
+        MavenXpp3Writer mavenWriter = new MavenXpp3Writer();
+        Writer writer = new FileWriter(path);
+        mavenWriter.write(writer, model);
     }
 
     private String extractDatabaseNameFromContent(String content, String fileType, String filePath) {
@@ -295,82 +364,5 @@ public class SubmissionSavedListener {
             }
         }
         return null;
-    }
-
-    private InvocationResult executeExtractedProject(String workingDir) throws Exception {
-        try {
-            Path mvn = Paths.get(mavenHome);
-
-            InvocationRequest request = new DefaultInvocationRequest();
-
-            request.setInputStream(InputStream.nullInputStream());
-            request.setGoals(Arrays.asList("clean", "install"));
-            request.setBaseDirectory(new File(workingDir));
-            request.setMavenHome(mvn.toFile());
-
-            DefaultInvoker invoker = new DefaultInvoker();
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            invoker.setOutputHandler(new PrintStreamHandler(new PrintStream(out), true));
-
-            InvocationResult result = invoker.execute(request);
-
-            setMavenOutput(out.toString());
-
-            return result;
-        } catch (Exception e) {
-            System.err.println(": " + e.getMessage());
-            throw new Exception("Error executing Maven command!" + e.getMessage());
-        }
-    }
-
-    private void addSpotBugsPlugin(String pomFilePath) {
-        try {
-            String configuration = "<configuration> " +
-                    "<effort>default</effort> " +
-                    "<reportLevel>high</reportLevel> " +
-                    "<htmlOutput>true</htmlOutput> " +
-                    "<failOnError>false</failOnError>" +
-                    "</configuration>";
-            Model model = parsePomXmlFileToMavenPomModel(pomFilePath);
-
-            Xpp3Dom pluginConfiguration = Xpp3DomBuilder.build(new StringReader(configuration));
-
-            List<PluginExecution> pluginExecutions = new ArrayList<>();
-            PluginExecution pluginExecution = new PluginExecution();
-            pluginExecution.addGoal("check");
-            pluginExecution.setPhase("install");
-            pluginExecutions.add(pluginExecution);
-
-            Plugin spotBugs = new Plugin();
-            spotBugs.setGroupId("com.github.spotbugs");
-            spotBugs.setArtifactId("spotbugs-maven-plugin");
-            spotBugs.setVersion("4.7.3.5");
-            spotBugs.setConfiguration(pluginConfiguration);
-            spotBugs.setExecutions(pluginExecutions);
-
-            model.getBuild().addPlugin(spotBugs);
-
-            parseMavenPomModelToXmlString(pomFilePath, model);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Model parsePomXmlFileToMavenPomModel(String path) throws Exception {
-        Model model;
-        FileReader reader;
-
-        MavenXpp3Reader mavenReader = new MavenXpp3Reader();
-        reader = new FileReader(path);
-        model = mavenReader.read(reader);
-
-        return model;
-    }
-
-    private void parseMavenPomModelToXmlString(String path, Model model) throws Exception {
-        MavenXpp3Writer mavenWriter = new MavenXpp3Writer();
-        Writer writer = new FileWriter(path);
-        mavenWriter.write(writer, model);
     }
 }
