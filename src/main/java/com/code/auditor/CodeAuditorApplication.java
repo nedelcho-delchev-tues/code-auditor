@@ -17,16 +17,16 @@ public class CodeAuditorApplication {
         SpringApplication.run(CodeAuditorApplication.class, args);
     }
 
-    @Bean
-    public CommandLineRunner commandLineRunner(AuthenticationService service) {
-        return args -> {
-            User student = new User("user", "user", "user@codeauditor.com", "123456", Role.STUDENT);
-            User admin = new User("admin", "admin", "admin@codeauditor.com", "123456", Role.ADMIN);
-            User professor = new User("professor", "professor", "professor@codeauditor.com", "123456", Role.PROFESSOR);
-
-            System.out.println("Student token: " + service.register(student).getAccessToken());
-            System.out.println("Admin token: " + service.register(admin).getAccessToken());
-            System.out.println("Professor token: " + service.register(professor).getAccessToken());
-        };
-    }
+//    @Bean
+//    public CommandLineRunner commandLineRunner(AuthenticationService service) {
+//        return args -> {
+//            User student = new User("user", "user", "user@codeauditor.com", "123456", Role.STUDENT);
+//            User admin = new User("admin", "admin", "admin@codeauditor.com", "123456", Role.ADMIN);
+//            User professor = new User("professor", "professor", "professor@codeauditor.com", "123456", Role.PROFESSOR);
+//
+//            System.out.println("Student token: " + service.register(student).getAccessToken());
+//            System.out.println("Admin token: " + service.register(admin).getAccessToken());
+//            System.out.println("Professor token: " + service.register(professor).getAccessToken());
+//        };
+//    }
 }
